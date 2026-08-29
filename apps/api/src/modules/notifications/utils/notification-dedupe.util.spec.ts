@@ -30,10 +30,7 @@ describe('notification dedupe helpers', () => {
 
   it('builds a bull-safe job id from tenant and dedupe key', () => {
     expect(
-      toNotificationJobId(
-        'tenant-1',
-        'import:job-1:IMPORT_COMPLETED:user-1',
-      ),
+      toNotificationJobId('tenant-1', 'import:job-1:IMPORT_COMPLETED:user-1'),
     ).toBe('notification-tenant-1-import-job-1-IMPORT_COMPLETED-user-1');
   });
 });

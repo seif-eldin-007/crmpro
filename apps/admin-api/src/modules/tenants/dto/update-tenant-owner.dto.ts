@@ -12,13 +12,15 @@ export class UpdateTenantOwnerDto {
   @IsString()
   @MinLength(2)
   @MaxLength(120)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   fullName?: string;
 
   @IsOptional()
   @IsEmail()
   @MaxLength(255)
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   email?: string;

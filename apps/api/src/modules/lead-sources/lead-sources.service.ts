@@ -10,11 +10,7 @@ import {
   getPaginationParams,
   PaginatedResponse,
 } from '../../common/pagination';
-import {
-  buildOrderBy,
-  normalizeSearch,
-  SortOrder,
-} from '../../common/query';
+import { buildOrderBy, normalizeSearch, SortOrder } from '../../common/query';
 import {
   normalizeDisplayName,
   normalizeNameForComparison,
@@ -141,11 +137,7 @@ export class LeadSourcesService {
   private buildOrderBy(
     query: ListLeadSourcesQueryDto,
   ): Prisma.LeadSourceOrderByWithRelationInput {
-    return buildOrderBy(
-      query.sortBy,
-      query.sortOrder,
-      LEAD_SOURCE_SORT_CONFIG,
-    );
+    return buildOrderBy(query.sortBy, query.sortOrder, LEAD_SOURCE_SORT_CONFIG);
   }
 
   private async getLeadSourceOrThrow(id: string, tenantId: string) {

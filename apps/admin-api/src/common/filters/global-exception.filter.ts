@@ -1,9 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  Logger,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
 import { mapExceptionToApiErrorResponse } from '@crmpro/shared/errors';
 import type { Request, Response } from 'express';
 
@@ -27,7 +22,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           method: request.method,
           path: request.originalUrl ?? request.url,
           requestId: request.requestId,
-          error: exception instanceof Error ? exception.message : String(exception),
+          error:
+            exception instanceof Error ? exception.message : String(exception),
           stack: exception instanceof Error ? exception.stack : undefined,
         },
         'Unhandled exception',

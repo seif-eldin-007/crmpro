@@ -1,6 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ContractStatus, TenantStatus } from '@crmpro/database';
+import { TenantStatus } from '@crmpro/database';
 import { PrismaService } from '../prisma/prisma.service';
 import { TENANT_ACCESS_MESSAGES } from './tenant-access.constants';
 import { TenantAccessService } from './tenant-access.service';

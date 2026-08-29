@@ -18,7 +18,8 @@ describe('RequestIdMiddleware', () => {
     middleware.use(req, res, next);
 
     expect(req.requestId).toEqual(expect.any(String));
-    expect(res.setHeader).toHaveBeenCalledWith('X-Request-ID', req.requestId);
+    const setHeader = Reflect.get(res, 'setHeader') as jest.Mock;
+    expect(setHeader).toHaveBeenCalledWith('X-Request-ID', req.requestId);
     expect(next).toHaveBeenCalled();
   });
 
@@ -38,6 +39,7 @@ describe('RequestIdMiddleware', () => {
     middleware.use(req, res, next);
 
     expect(req.requestId).toBe(incomingId);
-    expect(res.setHeader).toHaveBeenCalledWith('X-Request-ID', incomingId);
+    const setHeader = Reflect.get(res, 'setHeader') as jest.Mock;
+    expect(setHeader).toHaveBeenCalledWith('X-Request-ID', incomingId);
   });
 });

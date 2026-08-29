@@ -40,7 +40,7 @@ interface LeadsTableState {
 
 const DEFAULT_LIMIT = 25;
 
-export const useLeadsTableStore = create<LeadsTableState>((set, get) => ({
+export const useLeadsTableStore = create<LeadsTableState>((set) => ({
   page: 1,
   limit: DEFAULT_LIMIT,
   sortBy: "createdAt",

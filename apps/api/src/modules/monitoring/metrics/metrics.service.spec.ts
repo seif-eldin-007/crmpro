@@ -62,13 +62,17 @@ describe('MetricsService', () => {
 
     const service = module.get(MetricsService);
     await expect(service.getMetrics()).resolves.toEqual({
-      http: expect.objectContaining({ totalRequests: 5 }),
-      queues: expect.any(Object),
+      http: expect.objectContaining({
+        totalRequests: 5,
+      }) as Record<string, unknown>,
+      queues: expect.any(Object) as object,
       notifications: expect.objectContaining({
         created: 3,
         unreadCount: 1,
-      }),
-      workers: expect.objectContaining({ notification: 'running' }),
+      }) as Record<string, unknown>,
+      workers: expect.objectContaining({
+        notification: 'running',
+      }) as Record<string, unknown>,
     });
   });
 });

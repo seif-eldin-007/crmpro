@@ -6,7 +6,10 @@ import { ExportProcessor } from './export.processor';
 
 describe('ExportProcessor', () => {
   let processor: ExportProcessor;
-  let exportJobsService: { processExportJob: jest.Mock; failExportJobIfActive: jest.Mock };
+  let exportJobsService: {
+    processExportJob: jest.Mock;
+    failExportJobIfActive: jest.Mock;
+  };
 
   beforeEach(async () => {
     exportJobsService = {
@@ -15,7 +18,9 @@ describe('ExportProcessor', () => {
     };
 
     const bullService = {
-      getConnectionOptions: jest.fn().mockReturnValue({ host: 'localhost', port: 6379 }),
+      getConnectionOptions: jest
+        .fn()
+        .mockReturnValue({ host: 'localhost', port: 6379 }),
       getPrefix: jest.fn().mockReturnValue('crmpro'),
       getExportConcurrency: jest.fn().mockReturnValue(2),
       getDefaultJobOptions: jest.fn().mockReturnValue({ attempts: 3 }),
@@ -41,10 +46,16 @@ describe('ExportProcessor', () => {
   });
 
   it('executes export processing through ExportJobsService', async () => {
-    await (processor as unknown as { handleJob: (job: { data: { jobId: string } }) => Promise<void> }).handleJob({
+    await (
+      processor as unknown as {
+        handleJob: (job: { data: { jobId: string } }) => Promise<void>;
+      }
+    ).handleJob({
       data: { jobId: 'export-job-1' },
     });
 
-    expect(exportJobsService.processExportJob).toHaveBeenCalledWith('export-job-1');
+    expect(exportJobsService.processExportJob).toHaveBeenCalledWith(
+      'export-job-1',
+    );
   });
 });

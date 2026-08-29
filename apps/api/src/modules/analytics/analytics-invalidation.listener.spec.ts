@@ -9,7 +9,9 @@ import { AnalyticsInvalidationService } from './analytics-invalidation.service';
 
 describe('AnalyticsInvalidationListener', () => {
   it('invalidates analytics cache when subscribed events are published', async () => {
-    const invalidation = { invalidateTenant: jest.fn().mockResolvedValue(undefined) };
+    const invalidation = {
+      invalidateTenant: jest.fn().mockResolvedValue(undefined),
+    };
     const eventBus = new DomainEventBus();
 
     const module: TestingModule = await Test.createTestingModule({

@@ -36,12 +36,9 @@ export class QueueMetricsService {
   }
 
   private async getCounts(queueName: QueueName): Promise<QueueMetricsSnapshot> {
-    const counts = await this.bullService.getQueue(queueName).getJobCounts(
-      'waiting',
-      'active',
-      'completed',
-      'failed',
-    );
+    const counts = await this.bullService
+      .getQueue(queueName)
+      .getJobCounts('waiting', 'active', 'completed', 'failed');
 
     return {
       waiting: counts.waiting ?? 0,

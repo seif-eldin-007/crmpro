@@ -145,9 +145,8 @@ export class TenantNotesService {
       return;
     }
 
-    const keys = await this.permissionsService.getPermissionKeysForAdmin(
-      actorAdminId,
-    );
+    const keys =
+      await this.permissionsService.getPermissionKeysForAdmin(actorAdminId);
 
     if (keys.has(ADMIN_PERMISSIONS.TENANT_UPDATE)) {
       return;

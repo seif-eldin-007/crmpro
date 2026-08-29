@@ -64,7 +64,10 @@ export class AdminSessionService {
     }
   }
 
-  async revokeCurrentSession(sessionId: string, adminId: string): Promise<void> {
+  async revokeCurrentSession(
+    sessionId: string,
+    adminId: string,
+  ): Promise<void> {
     await this.prisma.adminSession.updateMany({
       where: {
         id: sessionId,

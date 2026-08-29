@@ -1,8 +1,6 @@
 import { Transform } from 'class-transformer';
 import {
-  IsBoolean,
   IsEmail,
-  IsOptional,
   IsString,
   IsUUID,
   Matches,
@@ -15,7 +13,7 @@ const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/;
 export class CreateAdminDto {
   @IsEmail()
   @MaxLength(255)
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   email: string;
@@ -32,7 +30,9 @@ export class CreateAdminDto {
   @IsString()
   @MinLength(2)
   @MaxLength(120)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   fullName: string;
 
   @IsUUID()

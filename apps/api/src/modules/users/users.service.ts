@@ -39,13 +39,9 @@ const USER_SORT_CONFIG = {
   defaultOrder: SortOrder.DESC,
 };
 
-const userWithRoleAndTenant = Prisma.validator<Prisma.UserDefaultArgs>()({
-  include: { role: true, tenant: true },
-});
-
-export type UserWithRoleAndTenant = Prisma.UserGetPayload<
-  typeof userWithRoleAndTenant
->;
+export type UserWithRoleAndTenant = Prisma.UserGetPayload<{
+  include: { role: true; tenant: true };
+}>;
 
 @Injectable()
 export class UsersService {
@@ -131,11 +127,7 @@ export class UsersService {
     const activeSessionCount =
       await this.userSessionService.countActiveSessions(id);
 
-    return toUserDetail(
-      user,
-      authorization.permissions,
-      activeSessionCount,
-    );
+    return toUserDetail(user, authorization.permissions, activeSessionCount);
   }
 
   async createUser(
@@ -427,7 +419,9 @@ export class UsersService {
     };
   }
 
-  async getUserQuota(tenantId: string): Promise<{ maxUsers: number | null; currentUsers: number }> {
+  async getUserQuota(
+    tenantId: string,
+  ): Promise<{ maxUsers: number | null; currentUsers: number }> {
     const plan = await this.quotaService.getTenantPlanLimits(tenantId);
     const currentUsers = await this.prisma.user.count({
       where: { tenantId, deletedAt: null, isActive: true },
@@ -447,7 +441,10 @@ export class UsersService {
     return !existing;
   }
 
-  private async assertEmailAvailable(tenantId: string, email: string): Promise<void> {
+  private async assertEmailAvailable(
+    tenantId: string,
+    email: string,
+  ): Promise<void> {
     const existing = await this.prisma.user.findFirst({
       where: {
         tenantId,

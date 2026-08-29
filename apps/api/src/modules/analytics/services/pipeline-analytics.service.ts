@@ -44,7 +44,9 @@ export class PipelineAnalyticsService {
         },
         _count: { _all: true },
       }),
-      this.prisma.$queryRaw<Array<{ stage_id: string; avg_days: number | null }>>`
+      this.prisma.$queryRaw<
+        Array<{ stage_id: string; avg_days: number | null }>
+      >`
         SELECT
           l."pipelineStageId" AS stage_id,
           AVG(

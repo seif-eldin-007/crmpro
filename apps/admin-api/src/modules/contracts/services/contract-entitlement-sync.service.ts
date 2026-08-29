@@ -51,7 +51,9 @@ export class ContractEntitlementSyncService {
     });
 
     if (!tenant) {
-      throw new InternalServerErrorException('Tenant not found for contract sync');
+      throw new InternalServerErrorException(
+        'Tenant not found for contract sync',
+      );
     }
 
     if (tenant.subscriptionPlanId !== activeContract.planId) {

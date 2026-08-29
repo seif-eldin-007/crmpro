@@ -1,4 +1,5 @@
 import { CanActivate } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PermissionsGuard } from '../../common/auth/guards/permissions.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -62,6 +63,8 @@ describe('MonitoringController', () => {
       controllers: [MonitoringController],
       providers: [
         { provide: MonitoringService, useValue: monitoringService },
+        // Required by InternalMonitoringGuard used on the internal snapshot route.
+        { provide: ConfigService, useValue: { get: jest.fn() } },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -76,7 +79,10 @@ describe('MonitoringController', () => {
   it('returns global health', async () => {
     await expect(controller.getHealth()).resolves.toEqual({
       success: true,
-      data: expect.objectContaining({ api: 'up', database: 'up' }),
+      data: expect.objectContaining({
+        api: 'up',
+        database: 'up',
+      }) as Record<string, unknown>,
     });
   });
 
@@ -84,8 +90,10 @@ describe('MonitoringController', () => {
     await expect(controller.getJobsHealth()).resolves.toEqual({
       success: true,
       data: expect.objectContaining({
-        workers: expect.objectContaining({ import: 'running' }),
-      }),
+        workers: expect.objectContaining({
+          import: 'running',
+        }) as Record<string, unknown>,
+      }) as Record<string, unknown>,
     });
   });
 
@@ -93,8 +101,10 @@ describe('MonitoringController', () => {
     await expect(controller.getMetrics()).resolves.toEqual({
       success: true,
       data: expect.objectContaining({
-        http: expect.objectContaining({ totalRequests: 10 }),
-      }),
+        http: expect.objectContaining({
+          totalRequests: 10,
+        }) as Record<string, unknown>,
+      }) as Record<string, unknown>,
     });
   });
 });

@@ -51,6 +51,8 @@ export function EditLeadDialog() {
     if (!open || !lead) return;
 
     const interest = getPrimaryProjectInterest(lead);
+    // Hydrating the form from the fetched lead when the dialog opens
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFullName(lead.fullName);
     setPrimaryPhone(lead.primaryPhone);
     setSecondaryPhone(lead.secondaryPhone ?? "");

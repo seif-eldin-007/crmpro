@@ -21,7 +21,8 @@ export class WorkerLoggingService {
     configService: ConfigService,
   ) {
     this.enabled =
-      configService.get<boolean>(LOGGING_CONFIG_KEYS.enableWorkerLogging) ?? true;
+      configService.get<boolean>(LOGGING_CONFIG_KEYS.enableWorkerLogging) ??
+      true;
   }
 
   queued(context: WorkerLogContext): void {

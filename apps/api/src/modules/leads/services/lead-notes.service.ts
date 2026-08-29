@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { LeadActivityEventType, Prisma } from '@crmpro/database';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { CreateLeadNoteDto } from '../dto/create-lead-note.dto';

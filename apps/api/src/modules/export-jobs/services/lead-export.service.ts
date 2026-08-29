@@ -44,9 +44,7 @@ export class LeadExportService {
     return this.leadsService.buildLeadsWhereInput(tenantId, params);
   }
 
-  buildOrderBy(
-    params: LeadExportParams,
-  ): Prisma.LeadOrderByWithRelationInput {
+  buildOrderBy(params: LeadExportParams): Prisma.LeadOrderByWithRelationInput {
     return this.leadsService.buildLeadsOrderBy(
       params.sortBy,
       params.sortOrder as SortOrder | undefined,

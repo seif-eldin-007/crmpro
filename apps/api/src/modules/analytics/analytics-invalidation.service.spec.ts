@@ -24,6 +24,8 @@ describe('AnalyticsInvalidationService', () => {
   it('invalidates all analytics cache keys for a tenant', async () => {
     await service.invalidateTenant('tenant-1');
 
-    expect(cacheService.invalidateTenantAnalytics).toHaveBeenCalledWith('tenant-1');
+    expect(cacheService.invalidateTenantAnalytics).toHaveBeenCalledWith(
+      'tenant-1',
+    );
   });
 });

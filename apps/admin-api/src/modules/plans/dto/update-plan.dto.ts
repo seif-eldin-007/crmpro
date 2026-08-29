@@ -18,13 +18,17 @@ export class UpdatePlanDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   name?: string;
 
   @IsOptional()
   @IsString()
   @MaxLength(1000)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   description?: string;
 
   @IsOptional()
@@ -38,7 +42,7 @@ export class UpdatePlanDto {
   @ValidateIf((_, value) => value !== null)
   @IsString()
   @Matches(/^[A-Z]{3}$/, { message: 'Currency must be a 3-letter ISO code' })
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toUpperCase() : value,
   )
   currency?: string | null;

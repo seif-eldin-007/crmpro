@@ -1,9 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  DEFAULT_LOG_LEVEL,
-  LOGGING_CONFIG_KEYS,
-} from './logging.constants';
+import { DEFAULT_LOG_LEVEL, LOGGING_CONFIG_KEYS } from './logging.constants';
 import { LogLevel, StructuredLogEntry } from './logging.types';
 import { RequestContextService } from './request-context.service';
 
@@ -23,9 +20,8 @@ export class LoggingService {
     private readonly requestContext: RequestContextService,
     configService: ConfigService,
   ) {
-    this.minLevel =
-      (configService.get<string>(LOGGING_CONFIG_KEYS.logLevel) ??
-        DEFAULT_LOG_LEVEL) as LogLevel;
+    this.minLevel = (configService.get<string>(LOGGING_CONFIG_KEYS.logLevel) ??
+      DEFAULT_LOG_LEVEL) as LogLevel;
   }
 
   debug(entry: StructuredLogEntry): void {

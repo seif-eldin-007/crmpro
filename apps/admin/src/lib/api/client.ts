@@ -2,10 +2,6 @@ import type { ApiResponse } from "@/types/api";
 import { useAuthStore } from "@/stores/auth-store";
 import { getQueryClient } from "@/lib/query/query-client";
 import { resolveApiBaseUrl } from "@/lib/api/resolve-api-base-url";
-import {
-  getStoredRefreshToken,
-  setStoredRefreshToken,
-} from "@/lib/api/refresh-token";
 
 /**
  * Normalized API error thrown by the client for any non-success response.
@@ -55,8 +51,8 @@ export function handleAuthFailure(): void {
 }
 
 /**
- * Admin-api returns auth tokens at the top level (not under `data`).
- * Refresh requires the refresh token in the request body (no httpOnly cookie).
+ * Silent refresh via the httpOnly refresh cookie (same-origin proxy).
+ * Single-flight: concurrent 401s share one refresh request.
  */
 async function refreshAccessToken(): Promise<string> {
   if (refreshPromise) {
@@ -65,23 +61,19 @@ async function refreshAccessToken(): Promise<string> {
 
   refreshPromise = (async () => {
     try {
-      const refreshToken = getStoredRefreshToken();
-      if (!refreshToken) {
-        throw new ApiError({
-          code: "NO_REFRESH_TOKEN",
-          message: "Session expired. Please sign in again.",
-          status: 401,
-        });
-      }
+      const response = await fetch(buildUrl("/auth/refresh"), {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        credentials: "include",
+        cache: "no-store",
+      });
 
-      const result = await executeAuthRequest<{
-        accessToken: string;
-        refreshToken: string;
-      }>("POST", "/auth/refresh", { refreshToken });
+      const { accessToken } = await parseEnvelope<{ accessToken: string }>(
+        response,
+      );
 
-      setStoredRefreshToken(result.refreshToken);
-      useAuthStore.getState().setAccessToken(result.accessToken);
-      return result.accessToken;
+      useAuthStore.getState().setAccessToken(accessToken);
+      return accessToken;
     } catch (error) {
       handleAuthFailure();
       throw error;
@@ -138,69 +130,6 @@ async function parseEnvelope<T>(response: Response): Promise<T> {
   }
 
   return payload.data;
-}
-
-type AuthEnvelope = {
-  success?: boolean;
-  error?: { code?: string; message?: string; details?: unknown };
-  [key: string]: unknown;
-};
-
-/**
- * Parse admin-api auth responses where tokens live at the top level.
- */
-async function parseAuthPayload<T>(response: Response): Promise<T> {
-  let payload: AuthEnvelope | null = null;
-  try {
-    payload = (await response.json()) as AuthEnvelope;
-  } catch {
-    throw new ApiError({
-      code: "UNEXPECTED_RESPONSE",
-      message: `Request failed with status ${response.status}`,
-      status: response.status,
-    });
-  }
-
-  if (!response.ok || !payload?.success) {
-    throw new ApiError({
-      code: payload?.error?.code ?? "UNKNOWN_ERROR",
-      message: payload?.error?.message ?? "Something went wrong.",
-      status: response.status,
-      details: payload?.error?.details,
-    });
-  }
-
-  const { success: _success, error: _error, ...rest } = payload;
-  return rest as T;
-}
-
-async function executeAuthRequest<T>(
-  method: string,
-  path: string,
-  body?: unknown,
-): Promise<T> {
-  let response: Response;
-  try {
-    response = await fetch(buildUrl(path), {
-      method,
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
-      credentials: "include",
-        cache: "no-store",
-    });
-  } catch (cause) {
-    throw new ApiError({
-      code: "NETWORK_ERROR",
-      message: "Unable to reach the server. Check your connection.",
-      status: 0,
-      details: cause,
-    });
-  }
-
-  return parseAuthPayload<T>(response);
 }
 
 async function executeRequest<T>(
@@ -264,7 +193,4 @@ export const apiClient = {
     executeRequest<T>("PATCH", path, body, options),
   delete: <T>(path: string, options?: RequestOptions) =>
     executeRequest<T>("DELETE", path, undefined, options),
-  /** Auth endpoints that return tokens at the top level. */
-  authPost: <T>(path: string, body?: unknown) =>
-    executeAuthRequest<T>("POST", path, body),
 };

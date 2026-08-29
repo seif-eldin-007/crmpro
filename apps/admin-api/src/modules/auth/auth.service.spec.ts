@@ -1,7 +1,4 @@
-import {
-  ForbiddenException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { TokenService } from './token.service';
@@ -72,7 +69,9 @@ describe('AuthService', () => {
     verifyRefreshToken: jest.fn(),
     formatRefreshToken: jest.fn().mockReturnValue('session.raw-secret'),
     generateAccessToken: jest.fn().mockReturnValue('access-token'),
-    getRefreshTokenExpiresAt: jest.fn().mockReturnValue(new Date(Date.now() + 86_400_000)),
+    getRefreshTokenExpiresAt: jest
+      .fn()
+      .mockReturnValue(new Date(Date.now() + 86_400_000)),
     parseRefreshToken: jest.fn(),
   };
 
@@ -98,12 +97,13 @@ describe('AuthService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    prisma.$transaction.mockImplementation(async (callback: (tx: unknown) => unknown) =>
-      callback({
-        adminSession: { create: jest.fn().mockResolvedValue(session) },
-        platformAdmin: { update: jest.fn() },
-        adminSession_updateMany: jest.fn(),
-      }),
+    prisma.$transaction.mockImplementation(
+      (callback: (tx: unknown) => unknown) =>
+        callback({
+          adminSession: { create: jest.fn().mockResolvedValue(session) },
+          platformAdmin: { update: jest.fn() },
+          adminSession_updateMany: jest.fn(),
+        }),
     );
 
     const module: TestingModule = await Test.createTestingModule({
@@ -158,8 +158,8 @@ describe('AuthService', () => {
         updateMany: jest.fn().mockResolvedValue({ count: 2 }),
       },
     };
-    prisma.$transaction.mockImplementation(async (callback: (client: typeof tx) => unknown) =>
-      callback(tx),
+    prisma.$transaction.mockImplementation(
+      (callback: (client: typeof tx) => unknown) => callback(tx),
     );
 
     await expect(
@@ -173,7 +173,7 @@ describe('AuthService', () => {
     );
     expect(tx.adminSession.updateMany).toHaveBeenCalledWith({
       where: { adminId: admin.id, revokedAt: null },
-      data: { revokedAt: expect.any(Date) },
+      data: { revokedAt: expect.any(Date) as Date },
     });
   });
 });

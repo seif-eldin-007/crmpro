@@ -7,7 +7,10 @@ export function calculateConversionRate(won: number, lost: number): number {
   return Math.round((won / denominator) * 10000) / 100;
 }
 
-export function calculateSourceConversionRate(won: number, total: number): number {
+export function calculateSourceConversionRate(
+  won: number,
+  total: number,
+): number {
   if (total === 0) {
     return 0;
   }

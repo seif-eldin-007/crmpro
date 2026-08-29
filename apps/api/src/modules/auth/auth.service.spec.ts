@@ -69,7 +69,9 @@ describe('AuthService tenant suspension enforcement', () => {
     tokenService = {
       generateRawRefreshSecret: jest.fn().mockReturnValue('secret'),
       hashRefreshToken: jest.fn().mockResolvedValue('hashed'),
-      getRefreshTokenExpiresAt: jest.fn().mockReturnValue(new Date('2099-01-01')),
+      getRefreshTokenExpiresAt: jest
+        .fn()
+        .mockReturnValue(new Date('2099-01-01')),
       generateAccessToken: jest.fn().mockReturnValue('access-token'),
       formatRefreshToken: jest.fn().mockReturnValue('refresh-token'),
       parseRefreshToken: jest.fn().mockReturnValue({
@@ -131,7 +133,7 @@ describe('AuthService tenant suspension enforcement', () => {
           email: 'owner@example.com',
           password: 'Password1',
         },
-        {},
+        { deviceName: null, ipAddress: null, userAgent: null },
       ),
     ).rejects.toThrow(ForbiddenException);
 
@@ -164,7 +166,7 @@ describe('AuthService tenant suspension enforcement', () => {
           email: 'owner@example.com',
           password: 'Password1',
         },
-        {},
+        { deviceName: null, ipAddress: null, userAgent: null },
       ),
     ).resolves.toEqual(
       expect.objectContaining({
@@ -278,7 +280,9 @@ describe('AuthService refresh token rotation', () => {
         },
         {
           provide: TenantAccessService,
-          useValue: { assertTenantAccessible: jest.fn().mockResolvedValue(undefined) },
+          useValue: {
+            assertTenantAccessible: jest.fn().mockResolvedValue(undefined),
+          },
         },
       ],
     }).compile();
@@ -294,7 +298,7 @@ describe('AuthService refresh token rotation', () => {
         id: 'session-1',
         hashedRefreshToken: 'old-hash',
         revokedAt: null,
-        expiresAt: { gt: expect.any(Date) },
+        expiresAt: { gt: expect.any(Date) as Date },
       },
       data: { hashedRefreshToken: 'new-hash' },
     });
@@ -310,6 +314,25 @@ describe('AuthService refresh token rotation', () => {
 
     expect(authLoggingService.refreshFailure).toHaveBeenCalledWith({
       reason: 'refresh_token_replay',
+      sessionId: 'session-1',
+    });
+    expect(tokenService.generateAccessToken).not.toHaveBeenCalled();
+    expect(authLoggingService.refreshSuccess).not.toHaveBeenCalled();
+  });
+
+  it('revokes every user session when an old refresh token is replayed on an active session', async () => {
+    tokenService.verifyRefreshToken.mockResolvedValue(false);
+
+    await expect(service.refresh('session-1.old-secret')).rejects.toThrow(
+      UnauthorizedException,
+    );
+
+    expect(prisma.userSession.updateMany).toHaveBeenCalledWith({
+      where: { userId: 'user-1', revokedAt: null },
+      data: { revokedAt: expect.any(Date) as Date },
+    });
+    expect(authLoggingService.refreshFailure).toHaveBeenCalledWith({
+      reason: 'refresh_token_reuse',
       sessionId: 'session-1',
     });
     expect(tokenService.generateAccessToken).not.toHaveBeenCalled();

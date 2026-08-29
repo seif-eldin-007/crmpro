@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JobStatus } from '@crmpro/database';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { TenantInactiveException, TenantStatusService } from '../../common/tenant/tenant-status.service';
+import {
+  TenantInactiveException,
+  TenantStatusService,
+} from '../../common/tenant/tenant-status.service';
 import { StorageService } from '../../common/storage/storage.service';
 import { LeadsService } from '../leads/leads.service';
 import { DomainEventBus } from '../../common/events/domain-event-bus.service';
@@ -48,7 +51,10 @@ describe('ImportJobsService tenant suspension', () => {
         { provide: DomainEventBus, useValue: { publish: jest.fn() } },
         { provide: NotificationTriggerService, useValue: {} },
         { provide: TenantStatusService, useValue: tenantStatusService },
-        { provide: AuditWriterService, useValue: { createAuditLog: jest.fn() } },
+        {
+          provide: AuditWriterService,
+          useValue: { createAuditLog: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -64,11 +70,14 @@ describe('ImportJobsService tenant suspension', () => {
 
     expect(prisma.importJob.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ id: 'job-1' }),
+        where: expect.objectContaining({ id: 'job-1' }) as Record<
+          string,
+          unknown
+        >,
         data: expect.objectContaining({
           status: JobStatus.FAILED,
           errorSummary: [{ row: 0, reason: 'Tenant is inactive.' }],
-        }),
+        }) as Record<string, unknown>,
       }),
     );
   });

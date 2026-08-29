@@ -20,7 +20,10 @@ describe('NotificationTriggerService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotificationTriggerService,
-        { provide: NotificationPreferencesService, useValue: preferencesService },
+        {
+          provide: NotificationPreferencesService,
+          useValue: preferencesService,
+        },
         { provide: NotificationQueueService, useValue: queueService },
       ],
     }).compile();

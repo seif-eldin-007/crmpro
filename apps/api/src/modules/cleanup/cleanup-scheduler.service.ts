@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { QueueService } from '../jobs/queues/queue.service';
 import {
@@ -34,13 +30,11 @@ export class CleanupSchedulerService implements OnModuleInit {
         CLEANUP_CONFIG_KEYS.uploadIntentsIntervalMs,
       ) ?? DEFAULT_UPLOAD_INTENTS_INTERVAL_MS;
     const staleJobsIntervalMs =
-      this.configService.get<number>(
-        CLEANUP_CONFIG_KEYS.staleJobsIntervalMs,
-      ) ?? DEFAULT_STALE_JOBS_INTERVAL_MS;
+      this.configService.get<number>(CLEANUP_CONFIG_KEYS.staleJobsIntervalMs) ??
+      DEFAULT_STALE_JOBS_INTERVAL_MS;
     const sessionsIntervalMs =
-      this.configService.get<number>(
-        CLEANUP_CONFIG_KEYS.sessionsIntervalMs,
-      ) ?? DEFAULT_SESSIONS_INTERVAL_MS;
+      this.configService.get<number>(CLEANUP_CONFIG_KEYS.sessionsIntervalMs) ??
+      DEFAULT_SESSIONS_INTERVAL_MS;
     const orphanS3Cron =
       this.configService.get<string>(CLEANUP_CONFIG_KEYS.orphanS3Cron) ??
       DEFAULT_ORPHAN_S3_CRON;

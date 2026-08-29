@@ -60,9 +60,14 @@ describe('ImportJobsService job claiming', () => {
         { provide: NotificationTriggerService, useValue: {} },
         {
           provide: TenantStatusService,
-          useValue: { assertTenantActive: jest.fn().mockResolvedValue(undefined) },
+          useValue: {
+            assertTenantActive: jest.fn().mockResolvedValue(undefined),
+          },
         },
-        { provide: AuditWriterService, useValue: { createAuditLog: jest.fn() } },
+        {
+          provide: AuditWriterService,
+          useValue: { createAuditLog: jest.fn() },
+        },
       ],
     }).compile();
 

@@ -1,8 +1,5 @@
 import { DomainEventBus } from './domain-event-bus.service';
-import {
-  DOMAIN_EVENT_TYPES,
-  LeadCreatedEvent,
-} from './domain-event.types';
+import { DOMAIN_EVENT_TYPES, LeadCreatedEvent } from './domain-event.types';
 
 describe('DomainEventBus', () => {
   it('delivers published events to subscribed handlers', async () => {

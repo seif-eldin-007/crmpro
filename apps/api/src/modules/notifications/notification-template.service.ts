@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  NotificationPriority,
-  NotificationType,
-} from '@crmpro/database';
+import { NotificationPriority, NotificationType } from '@crmpro/database';
 import {
   NotificationTemplateInput,
   NotificationTemplateResult,

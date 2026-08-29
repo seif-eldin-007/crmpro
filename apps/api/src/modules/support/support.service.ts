@@ -48,7 +48,12 @@ export class SupportService {
       ...(query.search
         ? {
             OR: [
-              { subject: { contains: query.search, mode: 'insensitive' as const } },
+              {
+                subject: {
+                  contains: query.search,
+                  mode: 'insensitive' as const,
+                },
+              },
               {
                 lastMessagePreview: {
                   contains: query.search,
@@ -161,7 +166,9 @@ export class SupportService {
       });
     });
 
-    this.eventBus.publish(new SupportMessageCreatedEvent(tenantId, conversation.id, userId, userId));
+    void this.eventBus.publish(
+      new SupportMessageCreatedEvent(tenantId, conversation.id, userId, userId),
+    );
     return toConversationListItem(conversation);
   }
 
@@ -218,7 +225,9 @@ export class SupportService {
       return created;
     });
 
-    this.eventBus.publish(new SupportMessageCreatedEvent(tenantId, conversationId, userId, userId));
+    void this.eventBus.publish(
+      new SupportMessageCreatedEvent(tenantId, conversationId, userId, userId),
+    );
     return toMessageItem(message);
   }
 
@@ -240,8 +249,14 @@ export class SupportService {
       },
     });
 
-    this.realtimeService.notifyUser(userId, { event: 'invalidate', data: { entity: 'support-messages', conversationId, actorId: 'system' } });
-    this.realtimeService.notifyAdmins({ event: 'invalidate', data: { entity: 'support-messages', conversationId, actorId: 'system' } });
+    this.realtimeService.notifyUser(userId, {
+      event: 'invalidate',
+      data: { entity: 'support-messages', conversationId, actorId: 'system' },
+    });
+    this.realtimeService.notifyAdmins({
+      event: 'invalidate',
+      data: { entity: 'support-messages', conversationId, actorId: 'system' },
+    });
     return toConversationListItem(updated);
   }
 

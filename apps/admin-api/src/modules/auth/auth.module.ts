@@ -12,6 +12,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { AdminSecurityService } from './services/admin-security.service';
 import { AdminSessionService } from './services/admin-session.service';
 import { AuthAuditService } from './services/auth-audit.service';
+import { LoginAttemptLimiterService } from './services/login-attempt-limiter.service';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AuthAuditService } from './services/auth-audit.service';
     AdminSessionService,
     AdminSecurityService,
     AuthAuditService,
+    LoginAttemptLimiterService,
   ],
   exports: [
     AuthService,

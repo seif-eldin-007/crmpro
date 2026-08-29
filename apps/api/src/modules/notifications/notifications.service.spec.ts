@@ -67,7 +67,7 @@ describe('NotificationsService', () => {
           tenantId: 'tenant-a',
           recipientUserId: 'user-a',
           deletedAt: null,
-        }),
+        }) as Record<string, unknown>,
       }),
     );
   });

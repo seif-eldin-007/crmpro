@@ -62,12 +62,12 @@ describe('RolesService', () => {
         count: jest.fn().mockResolvedValue(0),
       },
       user: { count: jest.fn().mockResolvedValue(0) },
-      $transaction: jest.fn(async (arg) => {
+      $transaction: jest.fn(async (arg: unknown) => {
         if (Array.isArray(arg)) {
-          return Promise.all(arg.map((query) => query));
+          return Promise.all(arg);
         }
 
-        return arg(prisma);
+        return (arg as (client: typeof prisma) => unknown)(prisma);
       }),
     };
 

@@ -1,9 +1,5 @@
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsOptional,
-  IsUUID,
-} from 'class-validator';
+import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 import { ListQueryDto } from '../../../common/query/dto/list-query.dto';
 
 export class GetAdminsQueryDto extends ListQueryDto {

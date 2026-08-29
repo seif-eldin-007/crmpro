@@ -23,6 +23,9 @@ describe('TenantProvisioningService contract concurrency', () => {
     ipAddress: '127.0.0.1',
     userAgent: 'jest',
     fingerprint: 'fp',
+    deviceName: null,
+    country: null,
+    city: null,
   };
 
   const lockedContractRow = {
@@ -51,6 +54,7 @@ describe('TenantProvisioningService contract concurrency', () => {
     leadSource: { createMany: jest.Mock };
     pipeline: { create: jest.Mock };
     pipelineStage: { createMany: jest.Mock };
+    user: { create: jest.Mock };
   };
 
   const allPermissions = Object.values(PERMISSIONS).map((key, index) => ({
@@ -101,7 +105,9 @@ describe('TenantProvisioningService contract concurrency', () => {
         findFirst: jest.fn().mockResolvedValue(null),
         create: jest.fn(),
       },
-      $transaction: jest.fn(async (callback) => callback(tx)),
+      $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
+        callback(tx),
+      ),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -114,7 +120,9 @@ describe('TenantProvisioningService contract concurrency', () => {
         },
         {
           provide: TenantsAuditService,
-          useValue: { logTenantCreated: jest.fn().mockResolvedValue(undefined) },
+          useValue: {
+            logTenantCreated: jest.fn().mockResolvedValue(undefined),
+          },
         },
       ],
     }).compile();
@@ -126,7 +134,7 @@ describe('TenantProvisioningService contract concurrency', () => {
     await service.provisionTenant(dto, 'admin-1', metadata);
 
     expect(tx.$queryRaw).toHaveBeenCalled();
-    const [query] = tx.$queryRaw.mock.calls[0];
+    const [query] = tx.$queryRaw.mock.calls[0] as unknown[];
     expect(String(query)).toContain('FOR UPDATE');
     expect(String(query)).toContain('"TenantContract"');
   });

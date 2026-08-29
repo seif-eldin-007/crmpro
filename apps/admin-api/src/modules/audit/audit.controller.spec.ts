@@ -33,7 +33,7 @@ describe('AuditController RBAC', () => {
       switchToHttp: () => ({
         getRequest: () => ({ admin }),
       }),
-    }) as Parameters<AdminPermissionsGuard['canActivate']>[0];
+    }) as unknown as Parameters<AdminPermissionsGuard['canActivate']>[0];
 
   beforeEach(async () => {
     permissionsService = {
@@ -57,8 +57,13 @@ describe('AuditController RBAC', () => {
       new Set([ADMIN_PERMISSIONS.AUDIT_READ]),
     );
 
-    const handler = AuditController.prototype.listAuditLogs;
-    const required = reflector.get(ADMIN_PERMISSIONS_METADATA_KEY, handler);
+    const handler = Reflect.get(AuditController.prototype, 'listAuditLogs') as (
+      ...args: unknown[]
+    ) => unknown;
+    const required = reflector.get<string[]>(
+      ADMIN_PERMISSIONS_METADATA_KEY,
+      handler,
+    );
 
     expect(required).toEqual([ADMIN_PERMISSIONS.AUDIT_READ]);
     await expect(guard.canActivate(buildContext(handler))).resolves.toBe(true);
@@ -69,7 +74,9 @@ describe('AuditController RBAC', () => {
       new Set([ADMIN_PERMISSIONS.TENANT_READ]),
     );
 
-    const handler = AuditController.prototype.listAuditLogs;
+    const handler = Reflect.get(AuditController.prototype, 'listAuditLogs') as (
+      ...args: unknown[]
+    ) => unknown;
 
     await expect(guard.canActivate(buildContext(handler))).rejects.toThrow(
       ForbiddenException,
@@ -107,8 +114,9 @@ describe('AuditController', () => {
   });
 
   it('lists audit logs', async () => {
-    await expect(controller.listAuditLogs({ page: 1, limit: 20 })).resolves
-      .toEqual({
+    await expect(
+      controller.listAuditLogs({ page: 1, limit: 20 }),
+    ).resolves.toEqual({
       success: true,
       data: {
         items: [],

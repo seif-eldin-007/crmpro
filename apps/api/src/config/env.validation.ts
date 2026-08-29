@@ -25,13 +25,17 @@ export const envValidationSchema = Joi.object({
   CLEANUP_STALE_JOBS_INTERVAL_MS: Joi.number().integer().min(1).optional(),
   CLEANUP_SESSIONS_INTERVAL_MS: Joi.number().integer().min(1).optional(),
   CLEANUP_ORPHAN_S3_CRON: Joi.string().optional(),
-  LOG_LEVEL: Joi.string()
-    .valid('debug', 'info', 'warn', 'error')
-    .optional(),
+  LOG_LEVEL: Joi.string().valid('debug', 'info', 'warn', 'error').optional(),
   ENABLE_HTTP_LOGGING: Joi.string().valid('true', 'false', '1', '0').optional(),
-  ENABLE_WORKER_LOGGING: Joi.string().valid('true', 'false', '1', '0').optional(),
-  ENABLE_QUERY_LOGGING: Joi.string().valid('true', 'false', '1', '0').optional(),
-  ENABLE_STORAGE_LOGGING: Joi.string().valid('true', 'false', '1', '0').optional(),
+  ENABLE_WORKER_LOGGING: Joi.string()
+    .valid('true', 'false', '1', '0')
+    .optional(),
+  ENABLE_QUERY_LOGGING: Joi.string()
+    .valid('true', 'false', '1', '0')
+    .optional(),
+  ENABLE_STORAGE_LOGGING: Joi.string()
+    .valid('true', 'false', '1', '0')
+    .optional(),
   ENABLE_AUTH_LOGGING: Joi.string().valid('true', 'false', '1', '0').optional(),
   SLOW_QUERY_THRESHOLD_MS: Joi.number().integer().min(1).optional(),
   API_VERSION: Joi.string().optional(),
@@ -39,10 +43,14 @@ export const envValidationSchema = Joi.object({
   ANALYTICS_CACHE_TTL_SECONDS: Joi.number().integer().min(1).optional(),
   NOTIFICATION_UNREAD_TTL_SECONDS: Joi.number().integer().min(1).optional(),
   BULL_NOTIFICATION_CONCURRENCY: Joi.number().integer().min(1).optional(),
-  JWT_ACCESS_SECRET: Joi.string().min(1).required(),
+  JWT_ACCESS_SECRET: Joi.string().min(32).required(),
   JWT_ACCESS_EXPIRATION: Joi.string().default('15m'),
   REFRESH_TOKEN_EXPIRATION: Joi.string().default('7d'),
   JWT_REFRESH_EXPIRATION: Joi.string().optional(),
+  REFRESH_COOKIE_CROSS_ORIGIN: Joi.string()
+    .valid('true', 'false', '1', '0')
+    .optional(),
+  ENABLE_SWAGGER: Joi.string().valid('true', 'false', '1', '0').optional(),
   CORS_ORIGINS: Joi.string().required(),
   AWS_REGION: Joi.string().required(),
   AWS_ACCESS_KEY_ID: Joi.string().required(),

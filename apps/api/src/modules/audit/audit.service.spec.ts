@@ -49,20 +49,20 @@ describe('AuditService', () => {
         findFirst: jest.fn(),
       },
       user: {
-        findMany: jest.fn().mockResolvedValue([
-          { id: 'user-2', name: 'Target User' },
-        ]),
+        findMany: jest
+          .fn()
+          .mockResolvedValue([{ id: 'user-2', name: 'Target User' }]),
       },
       role: { findMany: jest.fn().mockResolvedValue([]) },
       lead: { findMany: jest.fn().mockResolvedValue([]) },
       project: { findMany: jest.fn().mockResolvedValue([]) },
       fileAsset: { findMany: jest.fn().mockResolvedValue([]) },
-      $transaction: jest.fn(async (queries) => {
+      $transaction: jest.fn(async (queries: unknown) => {
         if (Array.isArray(queries)) {
-          return Promise.all(queries.map((query) => query));
+          return Promise.all(queries);
         }
 
-        return queries(prisma);
+        return (queries as (client: typeof prisma) => unknown)(prisma);
       }),
     };
 
@@ -96,8 +96,8 @@ describe('AuditService', () => {
   it('returns 404 when audit log belongs to another tenant', async () => {
     prisma.auditLog.findFirst.mockResolvedValue(null);
 
-    await expect(
-      service.getAuditLog('tenant-a', 'audit-1'),
-    ).rejects.toThrow(NotFoundException);
+    await expect(service.getAuditLog('tenant-a', 'audit-1')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });

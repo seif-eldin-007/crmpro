@@ -39,6 +39,8 @@ export function useLeadsTable({
     [sortBy, sortOrder],
   );
 
+  // TanStack Table intentionally returns non-memoizable handlers; React Compiler skips it
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

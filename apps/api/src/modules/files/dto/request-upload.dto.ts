@@ -10,7 +10,9 @@ import {
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from '../files.constants';
 
 export class RequestUploadDto {
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)

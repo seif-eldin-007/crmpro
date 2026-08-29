@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -43,10 +38,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Invalid authentication session');
     }
 
-    if (
-      user.tenantId !== payload.tenantId ||
-      user.roleId !== payload.roleId
-    ) {
+    if (user.tenantId !== payload.tenantId || user.roleId !== payload.roleId) {
       this.logger.warn(`Auth payload mismatch for user ${payload.sub}`);
       throw new UnauthorizedException('Invalid authentication session');
     }
@@ -87,7 +79,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     };
   }
 
-  private isValidPayload(payload: AccessTokenPayload): payload is AccessTokenPayload {
+  private isValidPayload(
+    payload: AccessTokenPayload,
+  ): payload is AccessTokenPayload {
     return (
       typeof payload?.sub === 'string' &&
       typeof payload?.tenantId === 'string' &&

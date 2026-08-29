@@ -10,6 +10,7 @@ import type { Request } from 'express';
 import {
   ADMIN_ANY_PERMISSIONS_METADATA_KEY,
   ADMIN_PERMISSIONS_METADATA_KEY,
+  ADMIN_PUBLIC_ROUTE_METADATA_KEY,
 } from '../constants';
 import { AdminPermissionsService } from '../services/admin-permissions.service';
 
@@ -36,6 +37,18 @@ export class AdminPermissionsGuard implements CanActivate {
     ]);
 
     if (!requiredAll?.length && !requiredAny?.length) {
+      // Fail closed: routes must declare their permission requirements
+      // explicitly. Only routes deliberately marked with @PublicAdminRoute()
+      // (self-service auth endpoints) are allowed without a permission decorator.
+      const isPublicRoute = this.reflector.getAllAndOverride<boolean>(
+        ADMIN_PUBLIC_ROUTE_METADATA_KEY,
+        [context.getHandler(), context.getClass()],
+      );
+
+      if (!isPublicRoute) {
+        throw new ForbiddenException('Insufficient permissions');
+      }
+
       return true;
     }
 

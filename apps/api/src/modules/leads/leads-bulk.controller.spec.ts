@@ -29,7 +29,7 @@ describe('LeadsBulkController RBAC', () => {
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
-    }) as Parameters<PermissionsGuard['canActivate']>[0];
+    }) as unknown as Parameters<PermissionsGuard['canActivate']>[0];
 
   beforeEach(async () => {
     permissionsService = {
@@ -49,8 +49,14 @@ describe('LeadsBulkController RBAC', () => {
   });
 
   it('requires lead.assign for bulk assign', () => {
-    const handler = LeadsBulkController.prototype.bulkAssignLeads;
-    const required = reflector.get(PERMISSIONS_METADATA_KEY, handler);
+    const handler = Reflect.get(
+      LeadsBulkController.prototype,
+      'bulkAssignLeads',
+    ) as (...args: unknown[]) => unknown;
+    const required = reflector.get<(typeof PERMISSIONS.LEAD_ASSIGN)[]>(
+      PERMISSIONS_METADATA_KEY,
+      handler,
+    );
 
     expect(required).toEqual([PERMISSIONS.LEAD_ASSIGN]);
   });
@@ -60,7 +66,10 @@ describe('LeadsBulkController RBAC', () => {
       new Set([PERMISSIONS.LEAD_READ, PERMISSIONS.LEAD_UPDATE]),
     );
 
-    const handler = LeadsBulkController.prototype.bulkAssignLeads;
+    const handler = Reflect.get(
+      LeadsBulkController.prototype,
+      'bulkAssignLeads',
+    ) as (...args: unknown[]) => unknown;
 
     await expect(guard.canActivate(buildContext(handler))).rejects.toThrow(
       ForbiddenException,
@@ -72,7 +81,10 @@ describe('LeadsBulkController RBAC', () => {
       new Set([PERMISSIONS.LEAD_ASSIGN]),
     );
 
-    const handler = LeadsBulkController.prototype.bulkAssignLeads;
+    const handler = Reflect.get(
+      LeadsBulkController.prototype,
+      'bulkAssignLeads',
+    ) as (...args: unknown[]) => unknown;
 
     await expect(guard.canActivate(buildContext(handler))).resolves.toBe(true);
   });

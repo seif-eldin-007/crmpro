@@ -41,7 +41,10 @@ import {
   CreateExportJobResponse,
   ExportJobResponse,
 } from '../entities/export-job.types';
-import { EXPORT_CSV_MIME_TYPE, EXPORT_DOWNLOAD_URL_EXPIRY_SECONDS } from '../export-jobs.constants';
+import {
+  EXPORT_CSV_MIME_TYPE,
+  EXPORT_DOWNLOAD_URL_EXPIRY_SECONDS,
+} from '../export-jobs.constants';
 import { CsvExportService } from './csv-export.service';
 import { LeadExportService } from './lead-export.service';
 
@@ -166,10 +169,7 @@ export class ExportJobsService {
       throw new NotFoundException(`Export job ${jobId} not found`);
     }
 
-    if (
-      job.status === JobStatus.COMPLETED ||
-      job.status === JobStatus.FAILED
-    ) {
+    if (job.status === JobStatus.COMPLETED || job.status === JobStatus.FAILED) {
       return;
     }
 
@@ -228,10 +228,7 @@ export class ExportJobsService {
     });
   }
 
-  async getExportJob(
-    id: string,
-    tenantId: string,
-  ): Promise<ExportJobResponse> {
+  async getExportJob(id: string, tenantId: string): Promise<ExportJobResponse> {
     const job = await this.getExportJobOrThrow(id, tenantId);
     return this.toExportJobResponse(job, tenantId);
   }
@@ -301,10 +298,7 @@ export class ExportJobsService {
           const progress =
             totalRows === 0
               ? 50
-              : Math.min(
-                  70,
-                  10 + Math.floor((processedRows / totalRows) * 60),
-                );
+              : Math.min(70, 10 + Math.floor((processedRows / totalRows) * 60));
 
           await this.prisma.exportJob.update({
             where: { id: jobId },
@@ -378,7 +372,7 @@ export class ExportJobsService {
     } catch (error: unknown) {
       const message =
         error instanceof BadRequestException
-          ? (error.message as string)
+          ? error.message
           : error instanceof Error
             ? error.message
             : 'Export failed';
@@ -424,9 +418,7 @@ export class ExportJobsService {
     };
   }
 
-  private normalizeFilters(
-    filters?: LeadExportParams,
-  ): LeadExportParams {
+  private normalizeFilters(filters?: LeadExportParams): LeadExportParams {
     if (!filters) {
       return {};
     }

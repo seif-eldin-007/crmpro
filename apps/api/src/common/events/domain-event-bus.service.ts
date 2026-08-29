@@ -28,6 +28,10 @@ export class DomainEventBus {
       return;
     }
 
-    await Promise.all([...handlers].map((handler) => handler(event)));
+    await Promise.all(
+      [...handlers].map(async (handler) => {
+        await handler(event);
+      }),
+    );
   }
 }

@@ -90,7 +90,7 @@ function normalizeMetadata(
   }
 
   if (typeof metadata === 'object' && !Array.isArray(metadata)) {
-    return metadata as Record<string, unknown>;
+    return metadata;
   }
 
   return null;

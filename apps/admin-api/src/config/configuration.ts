@@ -11,8 +11,7 @@ export default () => ({
     url: process.env.REDIS_URL,
   },
   tenantApi: {
-    baseUrl:
-      process.env.TENANT_API_URL ?? 'http://localhost:3000/api/v1',
+    baseUrl: process.env.TENANT_API_URL ?? 'http://localhost:3000/api/v1',
     internalMonitoringKey: process.env.INTERNAL_MONITORING_KEY,
   },
   jobs: {

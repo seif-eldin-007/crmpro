@@ -1,5 +1,11 @@
 import { FileAssetCategory } from '@crmpro/database';
-import { IsEnum, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator';
 import { PHASE1_UPLOAD_CATEGORIES } from '../files.constants';
 
 const Phase1Category = {
@@ -8,8 +14,7 @@ const Phase1Category = {
   OTHER: FileAssetCategory.OTHER,
 } as const;
 
-type Phase1CategoryValue =
-  (typeof Phase1Category)[keyof typeof Phase1Category];
+type Phase1CategoryValue = (typeof Phase1Category)[keyof typeof Phase1Category];
 
 export class CompleteUploadDto {
   @IsString()

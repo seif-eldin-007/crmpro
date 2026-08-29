@@ -17,6 +17,10 @@ yarn.lock
 # next
 .next
 out
+*.tsbuildinfo
+
+# root-level screenshot/verification artifacts
+/*.png
 
 # nest
 dist

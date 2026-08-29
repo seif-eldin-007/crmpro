@@ -28,7 +28,9 @@ describe('NotificationsController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [NotificationsController],
-      providers: [{ provide: NotificationsService, useValue: notificationsService }],
+      providers: [
+        { provide: NotificationsService, useValue: notificationsService },
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue(mockGuard)

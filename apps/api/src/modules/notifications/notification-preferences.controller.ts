@@ -19,7 +19,9 @@ export class NotificationPreferencesController {
 
   @Get()
   @RequirePermission(PERMISSIONS.NOTIFICATION_READ)
-  @ApiOperation({ summary: 'Get notification preferences for the current user' })
+  @ApiOperation({
+    summary: 'Get notification preferences for the current user',
+  })
   async getPreferences(@CurrentUser() user: AuthenticatedUser) {
     const data = await this.preferencesService.getPreferences(
       user.tenantId,
@@ -31,7 +33,9 @@ export class NotificationPreferencesController {
 
   @Patch()
   @RequirePermission(PERMISSIONS.NOTIFICATION_UPDATE)
-  @ApiOperation({ summary: 'Update notification preferences for the current user' })
+  @ApiOperation({
+    summary: 'Update notification preferences for the current user',
+  })
   async updatePreferences(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateNotificationPreferencesDto,

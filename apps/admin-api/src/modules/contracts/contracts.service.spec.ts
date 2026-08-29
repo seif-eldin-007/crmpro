@@ -12,6 +12,9 @@ describe('ContractsService entitlement sync', () => {
       findFirst: jest.Mock;
       update: jest.Mock;
     };
+    subscriptionPlan: {
+      findUnique: jest.Mock;
+    };
     $transaction: jest.Mock;
   };
   let entitlementSyncService: {
@@ -23,6 +26,9 @@ describe('ContractsService entitlement sync', () => {
     ipAddress: '127.0.0.1',
     userAgent: 'jest',
     fingerprint: 'fp',
+    deviceName: null,
+    country: null,
+    city: null,
   };
 
   beforeEach(async () => {
@@ -39,7 +45,9 @@ describe('ContractsService entitlement sync', () => {
         update: jest.fn(),
       },
       subscriptionPlan: {
-        findUnique: jest.fn().mockResolvedValue({ id: 'plan-enterprise', isActive: true }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: 'plan-enterprise', isActive: true }),
       },
       $transaction: jest.fn(),
     };
@@ -92,45 +100,48 @@ describe('ContractsService entitlement sync', () => {
       })
       .mockResolvedValueOnce(null);
 
-    prisma.$transaction.mockImplementation(async (callback) =>
-      callback({
-        tenantContract: {
-          update: jest.fn().mockResolvedValue({
-            id: 'contract-1',
-            status: ContractStatus.ACTIVE,
-            planId: 'plan-enterprise',
-            tenantId: 'tenant-1',
-            plan: { id: 'plan-enterprise', name: 'Enterprise', isActive: true },
-            createdByAdmin: {
-              id: 'admin-1',
-              fullName: 'Admin',
-              email: 'a@x.com',
-            },
-            contractStartAt: new Date('2026-01-01'),
-            contractEndAt: null,
-            contractName: null,
-            agreedPrice: { toNumber: () => 1000 },
-            currency: 'EGP',
-            paymentMethod: 'BANK_TRANSFER',
-            paymentFrequency: 'MONTHLY',
-            discountPercent: null,
-            gracePeriodDays: null,
-            autoRenew: false,
-            notes: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }),
-        },
-      }),
+    prisma.$transaction.mockImplementation(
+      (callback: (client: unknown) => unknown) =>
+        callback({
+          tenantContract: {
+            update: jest.fn().mockResolvedValue({
+              id: 'contract-1',
+              status: ContractStatus.ACTIVE,
+              planId: 'plan-enterprise',
+              tenantId: 'tenant-1',
+              plan: {
+                id: 'plan-enterprise',
+                name: 'Enterprise',
+                isActive: true,
+              },
+              createdByAdmin: {
+                id: 'admin-1',
+                fullName: 'Admin',
+                email: 'a@x.com',
+              },
+              contractStartAt: new Date('2026-01-01'),
+              contractEndAt: null,
+              contractName: null,
+              agreedPrice: { toNumber: () => 1000 },
+              currency: 'EGP',
+              paymentMethod: 'BANK_TRANSFER',
+              paymentFrequency: 'MONTHLY',
+              discountPercent: null,
+              gracePeriodDays: null,
+              autoRenew: false,
+              notes: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }),
+          },
+        }),
     );
 
     await service.activateContract('contract-1', 'admin-1', metadata);
 
-    expect(entitlementSyncService.syncTenantPlanFromContract).toHaveBeenCalledWith(
-      expect.anything(),
-      'tenant-1',
-      'plan-enterprise',
-    );
+    expect(
+      entitlementSyncService.syncTenantPlanFromContract,
+    ).toHaveBeenCalledWith(expect.anything(), 'tenant-1', 'plan-enterprise');
     expect(
       entitlementSyncService.assertTenantContractPlanConsistency,
     ).toHaveBeenCalledWith('tenant-1', expect.anything());

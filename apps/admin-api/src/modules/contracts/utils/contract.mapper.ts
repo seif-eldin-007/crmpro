@@ -1,8 +1,5 @@
 import { Prisma } from '@crmpro/database';
-import type {
-  ContractDetail,
-  ContractListItem,
-} from '../types/contract.types';
+import type { ContractDetail, ContractListItem } from '../types/contract.types';
 
 type ContractWithPlan = {
   id: string;
@@ -32,7 +29,9 @@ function toPrice(value: Prisma.Decimal): number {
   return value.toNumber();
 }
 
-export function toContractListItem(contract: ContractWithPlan): ContractListItem {
+export function toContractListItem(
+  contract: ContractWithPlan,
+): ContractListItem {
   return {
     id: contract.id,
     contractName: contract.contractName,
@@ -48,7 +47,9 @@ export function toContractListItem(contract: ContractWithPlan): ContractListItem
   };
 }
 
-export function toContractDetail(contract: ContractWithRelations): ContractDetail {
+export function toContractDetail(
+  contract: ContractWithRelations,
+): ContractDetail {
   return {
     id: contract.id,
     contractName: contract.contractName,

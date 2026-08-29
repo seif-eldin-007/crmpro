@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CLEANUP_JOB_NAMES,
-  CleanupJobName,
-} from './cleanup.constants';
+import { CLEANUP_JOB_NAMES, CleanupJobName } from './cleanup.constants';
 import { CleanupHealthEntry, CleanupHealthStatus } from './cleanup.types';
 
 @Injectable()
@@ -33,7 +30,10 @@ export class CleanupHealthService {
     });
   }
 
-  getHealthSummary(): { lastRun: string | null; status: 'healthy' | 'degraded' } {
+  getHealthSummary(): {
+    lastRun: string | null;
+    status: 'healthy' | 'degraded';
+  } {
     const entries = [...this.entries.values()];
     const lastRuns = entries
       .map((entry) => entry.lastRun)

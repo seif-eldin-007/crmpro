@@ -9,6 +9,10 @@ import { ContractEntitlementSyncService } from './services/contract-entitlement-
 @Module({
   imports: [AuthModule, AuthRbacModule],
   controllers: [ContractsController],
-  providers: [ContractsService, ContractsAuditService, ContractEntitlementSyncService],
+  providers: [
+    ContractsService,
+    ContractsAuditService,
+    ContractEntitlementSyncService,
+  ],
 })
 export class ContractsModule {}

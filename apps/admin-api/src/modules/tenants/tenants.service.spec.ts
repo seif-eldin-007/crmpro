@@ -15,6 +15,9 @@ describe('TenantsService reactivateTenant', () => {
     ipAddress: '127.0.0.1',
     userAgent: 'jest',
     fingerprint: 'fp',
+    deviceName: null,
+    country: null,
+    city: null,
   };
 
   let prisma: {
@@ -45,7 +48,7 @@ describe('TenantsService reactivateTenant', () => {
           plan: { id: 'plan-1', isActive: true },
         }),
       },
-      $transaction: jest.fn(async (callback) =>
+      $transaction: jest.fn((callback: (client: unknown) => unknown) =>
         callback({
           tenant: prisma.tenant,
         }),
@@ -79,7 +82,11 @@ describe('TenantsService reactivateTenant', () => {
   });
 
   it('reactivates when tenant has an active contract on an active plan', async () => {
-    const result = await service.reactivateTenant('tenant-1', 'admin-1', metadata);
+    const result = await service.reactivateTenant(
+      'tenant-1',
+      'admin-1',
+      metadata,
+    );
 
     expect(result).toEqual({
       tenantId: 'tenant-1',

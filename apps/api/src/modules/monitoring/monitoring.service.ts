@@ -7,7 +7,11 @@ import type {
   CleanupHealthProvider,
   JobsHealthProvider,
 } from '../../common/health';
-import { GlobalHealthData, JobsHealthData, MetricsData } from './monitoring.types';
+import {
+  GlobalHealthData,
+  JobsHealthData,
+  MetricsData,
+} from './monitoring.types';
 import { HealthCheckService } from './health/health-check.service';
 import { MetricsService } from './metrics/metrics.service';
 

@@ -38,6 +38,8 @@ export function EditStageDialog() {
 
   useEffect(() => {
     if (!stage) return;
+    // Hydrating the form from the selected stage when the dialog opens
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(stage.name);
     setColor(stage.color ?? STAGE_COLOR_PRESETS[0]);
   }, [stage]);

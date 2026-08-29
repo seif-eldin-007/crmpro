@@ -1,13 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import {
-  JobStatus,
-  LeadActivityEventType,
-  Prisma,
-} from '@crmpro/database';
+import { JobStatus, LeadActivityEventType, Prisma } from '@crmpro/database';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-import {
-  BULK_LEAD_AUDIT_ACTIONS,
-} from '../../leads/constants/leads-bulk.constants';
+import { BULK_LEAD_AUDIT_ACTIONS } from '../../leads/constants/leads-bulk.constants';
 import {
   EXPORT_AUDIT_ACTIONS,
   IMPORT_AUDIT_ACTIONS,
@@ -23,7 +17,7 @@ export class ActivityAnalyticsService {
     tenantId: string,
     options: { includeAudit: boolean },
   ): Promise<ActivityFeedItem[]> {
-    const [activities, importJobs, exportJobs, auditLogs] = await Promise.all([
+    const [activities, importJobs, exportJobs] = await Promise.all([
       this.prisma.leadActivity.findMany({
         where: {
           tenantId,
@@ -77,30 +71,31 @@ export class ActivityAnalyticsService {
         orderBy: { completedAt: 'desc' },
         take: 50,
       }),
-      options.includeAudit
-        ? this.prisma.auditLog.findMany({
-            where: {
-              tenantId,
-              action: {
-                in: [
-                  BULK_LEAD_AUDIT_ACTIONS.ASSIGNED,
-                  BULK_LEAD_AUDIT_ACTIONS.STAGE_CHANGED,
-                  IMPORT_AUDIT_ACTIONS.COMPLETED,
-                  EXPORT_AUDIT_ACTIONS.COMPLETED,
-                ],
-              },
-            },
-            select: {
-              id: true,
-              action: true,
-              metadata: true,
-              createdAt: true,
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 100,
-          })
-        : Promise.resolve([]),
     ]);
+
+    const auditLogs = options.includeAudit
+      ? await this.prisma.auditLog.findMany({
+          where: {
+            tenantId,
+            action: {
+              in: [
+                BULK_LEAD_AUDIT_ACTIONS.ASSIGNED,
+                BULK_LEAD_AUDIT_ACTIONS.STAGE_CHANGED,
+                IMPORT_AUDIT_ACTIONS.COMPLETED,
+                EXPORT_AUDIT_ACTIONS.COMPLETED,
+              ],
+            },
+          },
+          select: {
+            id: true,
+            action: true,
+            metadata: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 100,
+        })
+      : [];
 
     const merged: ActivityFeedItem[] = [
       ...activities.map((activity) => ({
@@ -179,17 +174,12 @@ export class ActivityAnalyticsService {
     }
   }
 
-  private buildAuditTitle(
-    action: string,
-    metadata: Prisma.JsonValue,
-  ): string {
-    const data = this.asMetadataRecord(metadata);
-
+  private buildAuditTitle(action: string, metadata: Prisma.JsonValue): string {
     switch (action) {
       case BULK_LEAD_AUDIT_ACTIONS.ASSIGNED:
-        return `Bulk assign: ${data.leadCount ?? 'multiple'} leads`;
+        return `Bulk assign: ${this.formatBulkLeadCount(metadata)} leads`;
       case BULK_LEAD_AUDIT_ACTIONS.STAGE_CHANGED:
-        return `Bulk stage change: ${data.leadCount ?? 'multiple'} leads`;
+        return `Bulk stage change: ${this.formatBulkLeadCount(metadata)} leads`;
       case IMPORT_AUDIT_ACTIONS.COMPLETED:
         return 'Import completed';
       case EXPORT_AUDIT_ACTIONS.COMPLETED:
@@ -199,11 +189,17 @@ export class ActivityAnalyticsService {
     }
   }
 
-  private asMetadataRecord(
-    value: Prisma.JsonValue,
-  ): Record<string, unknown> {
+  private formatBulkLeadCount(metadata: Prisma.JsonValue): string {
+    const data = this.asMetadataRecord(metadata);
+
+    return typeof data.leadCount === 'number'
+      ? String(data.leadCount)
+      : 'multiple';
+  }
+
+  private asMetadataRecord(value: Prisma.JsonValue): Record<string, unknown> {
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-      return value as Record<string, unknown>;
+      return value;
     }
 
     return {};

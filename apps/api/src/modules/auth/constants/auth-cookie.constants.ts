@@ -13,7 +13,9 @@ export interface RefreshCookieOptions {
   maxAge: number;
 }
 
-export function getRefreshCookieMaxAgeMs(refreshTokenExpiration: string): number {
+export function getRefreshCookieMaxAgeMs(
+  refreshTokenExpiration: string,
+): number {
   const duration = ms(refreshTokenExpiration as StringValue);
 
   if (duration === undefined) {

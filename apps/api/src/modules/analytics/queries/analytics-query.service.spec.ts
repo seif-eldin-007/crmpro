@@ -92,7 +92,10 @@ describe('AnalyticsQueryService', () => {
     expect(result.avgLeadAgeDays).toBe(12.3);
     expect(prisma.lead.count).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ tenantId: 'tenant-a', deletedAt: null }),
+        where: expect.objectContaining({
+          tenantId: 'tenant-a',
+          deletedAt: null,
+        }) as Record<string, unknown>,
       }),
     );
   });
@@ -145,9 +148,7 @@ describe('AnalyticsQueryService', () => {
         { sourceId: 'source-1', _count: { _all: 50 } },
         { sourceId: 'source-2', _count: { _all: 180 } },
       ])
-      .mockResolvedValueOnce([
-        { sourceId: 'source-2', _count: { _all: 52 } },
-      ]);
+      .mockResolvedValueOnce([{ sourceId: 'source-2', _count: { _all: 52 } }]);
     prisma.leadSource.findMany.mockResolvedValue([
       { id: 'source-1', name: 'Website' },
       { id: 'source-2', name: 'Facebook' },
@@ -155,7 +156,10 @@ describe('AnalyticsQueryService', () => {
 
     const result = await service.getLeadSources('tenant-a', {});
 
-    expect(result.map((item) => item.sourceName)).toEqual(['Facebook', 'Website']);
+    expect(result.map((item) => item.sourceName)).toEqual([
+      'Facebook',
+      'Website',
+    ]);
     expect(result[0]).toEqual(
       expect.objectContaining({
         sourceName: 'Facebook',
@@ -215,13 +219,13 @@ describe('AnalyticsQueryService', () => {
         tenantId: 'tenant-a',
         status: LeadStatus.OPEN,
         pipelineStage: { isClosed: false },
-      }),
+      }) as Record<string, unknown>,
     });
     expect(prisma.lead.count).toHaveBeenCalledWith({
       where: expect.objectContaining({
         tenantId: 'tenant-a',
         pipelineStage: { closeType: PipelineCloseType.WON },
-      }),
+      }) as Record<string, unknown>,
     });
   });
 
@@ -247,7 +251,10 @@ describe('AnalyticsQueryService', () => {
 
     expect(prisma.leadActivity.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ tenantId: 'tenant-a' }),
+        where: expect.objectContaining({ tenantId: 'tenant-a' }) as Record<
+          string,
+          unknown
+        >,
       }),
     );
     expect(prisma.importJob.findMany).toHaveBeenCalledWith(
@@ -255,7 +262,7 @@ describe('AnalyticsQueryService', () => {
         where: expect.objectContaining({
           tenantId: 'tenant-a',
           status: JobStatus.COMPLETED,
-        }),
+        }) as Record<string, unknown>,
       }),
     );
   });

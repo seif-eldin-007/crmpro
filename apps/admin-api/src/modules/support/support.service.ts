@@ -30,11 +30,16 @@ function previewOf(body: string): string {
 
 @Injectable()
 export class AdminSupportService {
-  constructor(private readonly prisma: PrismaService, private readonly realtimeService: RealtimeService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly realtimeService: RealtimeService,
+  ) {}
 
   async listConversations(
     query: GetAdminSupportConversationsQueryDto,
-  ): Promise<PaginatedResponse<ReturnType<typeof toAdminConversationListItem>>> {
+  ): Promise<
+    PaginatedResponse<ReturnType<typeof toAdminConversationListItem>>
+  > {
     const { page, limit, skip, take } = getPaginationParams(query);
     const where = {
       ...(query.status ? { status: query.status } : {}),
@@ -42,7 +47,12 @@ export class AdminSupportService {
       ...(query.search
         ? {
             OR: [
-              { subject: { contains: query.search, mode: 'insensitive' as const } },
+              {
+                subject: {
+                  contains: query.search,
+                  mode: 'insensitive' as const,
+                },
+              },
               {
                 lastMessagePreview: {
                   contains: query.search,
@@ -51,7 +61,10 @@ export class AdminSupportService {
               },
               {
                 tenant: {
-                  name: { contains: query.search, mode: 'insensitive' as const },
+                  name: {
+                    contains: query.search,
+                    mode: 'insensitive' as const,
+                  },
                 },
               },
             ],
@@ -170,16 +183,22 @@ export class AdminSupportService {
       return created;
     });
 
-    this.realtimeService.notifyUser(conversation.createdByUserId, { event: 'invalidate', data: { entity: 'support-messages', conversationId, actorId: adminId } });
-    this.realtimeService.notifyUser(conversation.createdByUserId, { event: 'invalidate', data: { entity: 'notifications' } });
-    this.realtimeService.notifyAdmins({ event: 'invalidate', data: { entity: 'support-messages', conversationId, actorId: adminId } });
+    this.realtimeService.notifyUser(conversation.createdByUserId, {
+      event: 'invalidate',
+      data: { entity: 'support-messages', conversationId, actorId: adminId },
+    });
+    this.realtimeService.notifyUser(conversation.createdByUserId, {
+      event: 'invalidate',
+      data: { entity: 'notifications' },
+    });
+    this.realtimeService.notifyAdmins({
+      event: 'invalidate',
+      data: { entity: 'support-messages', conversationId, actorId: adminId },
+    });
     return toMessageItem(message);
   }
 
-  async updateStatus(
-    conversationId: string,
-    dto: UpdateAdminSupportStatusDto,
-  ) {
+  async updateStatus(conversationId: string, dto: UpdateAdminSupportStatusDto) {
     await this.findConversationOrThrow(conversationId);
 
     const closed =
@@ -196,8 +215,14 @@ export class AdminSupportService {
       include: conversationInclude,
     });
 
-    this.realtimeService.notifyUser(updated.createdByUserId, { event: 'invalidate', data: { entity: 'support-messages', conversationId, actorId: 'system' } });
-    this.realtimeService.notifyAdmins({ event: 'invalidate', data: { entity: 'support-messages', conversationId, actorId: 'system' } });
+    this.realtimeService.notifyUser(updated.createdByUserId, {
+      event: 'invalidate',
+      data: { entity: 'support-messages', conversationId, actorId: 'system' },
+    });
+    this.realtimeService.notifyAdmins({
+      event: 'invalidate',
+      data: { entity: 'support-messages', conversationId, actorId: 'system' },
+    });
 
     return toAdminConversationListItem(updated);
   }

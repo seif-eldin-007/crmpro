@@ -5,9 +5,7 @@ import {
   NotificationStatus,
   Prisma,
 } from '@crmpro/database';
-import {
-  NOTIFICATION_PREFERENCE_LABELS,
-} from '../notifications.constants';
+import { NOTIFICATION_PREFERENCE_LABELS } from '../notifications.constants';
 import {
   NotificationPreferenceResponse,
   NotificationResponse,
@@ -66,8 +64,12 @@ export function toNotificationPreferenceResponse(
 export function normalizeMetadata(
   metadata: Notification['metadata'],
 ): Record<string, unknown> {
-  if (typeof metadata === 'object' && metadata !== null && !Array.isArray(metadata)) {
-    return metadata as Record<string, unknown>;
+  if (
+    typeof metadata === 'object' &&
+    metadata !== null &&
+    !Array.isArray(metadata)
+  ) {
+    return metadata;
   }
 
   return {};

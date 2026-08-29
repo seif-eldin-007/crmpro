@@ -27,19 +27,21 @@ export class CreateLeadDto {
   @IsUUID()
   assignedUserId?: string;
 
-  @Transform(({ value }) => normalizeWhitespace(value))
+  @Transform(({ value }: { value: unknown }) => normalizeWhitespace(value))
   @IsString()
   @MinLength(2)
   @MaxLength(150)
   fullName: string;
 
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   @IsString()
   @MinLength(1)
   primaryPhone: string;
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: unknown }) => {
     if (value === null || value === undefined) {
       return value;
     }
@@ -50,7 +52,7 @@ export class CreateLeadDto {
   secondaryPhone?: string | null;
 
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: unknown }) => {
     if (value === null || value === undefined) {
       return value;
     }

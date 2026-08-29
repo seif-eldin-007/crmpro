@@ -26,9 +26,14 @@ export class LeadsBulkService {
   ): Promise<BulkLeadActionResult> {
     const leadIds = this.deduplicateLeadIds(dto.leadIds);
     const result = await this.processLeads(leadIds, async (leadId) => {
-      await this.leadAssignmentService.assignLead(leadId, tenantId, actorUserId, {
-        userId: dto.userId,
-      });
+      await this.leadAssignmentService.assignLead(
+        leadId,
+        tenantId,
+        actorUserId,
+        {
+          userId: dto.userId,
+        },
+      );
     });
 
     await this.auditWriter.createAuditLog({

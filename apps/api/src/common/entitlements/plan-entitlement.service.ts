@@ -50,6 +50,6 @@ export class PlanEntitlementService {
       return {};
     }
 
-    return raw as PlanFeatureFlags;
+    return raw;
   }
 }

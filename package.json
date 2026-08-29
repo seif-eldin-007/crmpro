@@ -22,7 +22,9 @@
     "docker:logs": "docker compose -f docker/docker-compose.local.yml logs -f",
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "color": "^5.0.1",

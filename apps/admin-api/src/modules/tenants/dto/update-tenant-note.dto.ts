@@ -5,6 +5,8 @@ export class UpdateTenantNoteDto {
   @IsString()
   @MinLength(1)
   @MaxLength(5000)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   content!: string;
 }

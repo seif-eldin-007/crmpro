@@ -29,7 +29,7 @@ describe('AuditController RBAC', () => {
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
-    }) as Parameters<PermissionsGuard['canActivate']>[0];
+    }) as unknown as Parameters<PermissionsGuard['canActivate']>[0];
 
   beforeEach(async () => {
     permissionsService = {
@@ -53,8 +53,10 @@ describe('AuditController RBAC', () => {
       new Set([PERMISSIONS.AUDIT_READ]),
     );
 
-    const handler = AuditController.prototype.listAuditLogs;
-    const required = reflector.get(PERMISSIONS_METADATA_KEY, handler);
+    const handler = Reflect.get(AuditController.prototype, 'listAuditLogs') as (
+      ...args: unknown[]
+    ) => unknown;
+    const required = reflector.get<string[]>(PERMISSIONS_METADATA_KEY, handler);
 
     expect(required).toEqual([PERMISSIONS.AUDIT_READ]);
     await expect(guard.canActivate(buildContext(handler))).resolves.toBe(true);
@@ -65,7 +67,9 @@ describe('AuditController RBAC', () => {
       new Set([PERMISSIONS.LEAD_READ]),
     );
 
-    const handler = AuditController.prototype.listAuditLogs;
+    const handler = Reflect.get(AuditController.prototype, 'listAuditLogs') as (
+      ...args: unknown[]
+    ) => unknown;
 
     await expect(guard.canActivate(buildContext(handler))).rejects.toThrow(
       ForbiddenException,

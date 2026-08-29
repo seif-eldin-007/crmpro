@@ -1,12 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { NotificationPriority, NotificationType } from '@crmpro/database';
 import { Transform } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsISO8601,
-  IsOptional,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsISO8601, IsOptional } from 'class-validator';
 import { ListQueryDto } from '../../../common/query/dto/list-query.dto';
 
 export class GetNotificationsQueryDto extends ListQueryDto {

@@ -11,13 +11,15 @@ import { normalizeDisplayName } from '../../../common/utils/name-normalization.u
 import { PASSWORD_PATTERN } from '../users.constants';
 
 export class CreateUserDto {
-  @Transform(({ value }) => normalizeDisplayName(value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? normalizeDisplayName(value) : value,
+  )
   @IsString()
   @MinLength(2)
   @MaxLength(120)
   fullName: string;
 
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   @IsEmail()

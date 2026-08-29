@@ -1,7 +1,4 @@
-import {
-  AdminSecurityEventType,
-  SecuritySeverity,
-} from '@crmpro/database';
+import { AdminSecurityEventType, SecuritySeverity } from '@crmpro/database';
 import { IsEnum, IsISO8601, IsOptional, IsUUID } from 'class-validator';
 import { ListQueryDto } from '../../../common/query/dto/list-query.dto';
 

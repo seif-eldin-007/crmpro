@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ADMIN_PERMISSIONS } from "@crmpro/shared";
 import { AppIcons } from "@/components/icons/app-icons";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

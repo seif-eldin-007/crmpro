@@ -191,7 +191,7 @@ export class TenantProvisioningService {
         : null,
     );
 
-    return { id: contract!.id, planId: contract!.planId };
+    return { id: contract.id, planId: contract.planId };
   }
 
   /**

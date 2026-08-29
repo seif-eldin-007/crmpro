@@ -29,6 +29,8 @@ export function useWorkspaceLookup(rawSlug: string) {
     authToast.dismissWorkspace();
 
     if (!slug) {
+      // Derived status reset when the external slug input empties out
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("idle");
       setWorkspace(null);
       return;

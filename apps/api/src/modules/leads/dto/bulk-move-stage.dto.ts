@@ -1,9 +1,4 @@
-import {
-  ArrayMaxSize,
-  ArrayMinSize,
-  IsArray,
-  IsUUID,
-} from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsUUID } from 'class-validator';
 import {
   BULK_ACTION_VALIDATION_MESSAGE,
   MAX_BULK_ACTION_SIZE,

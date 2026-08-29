@@ -85,7 +85,9 @@ export class TrendAnalyticsService {
     dateKeys: string[],
     points: TrendCountPoint[],
   ): TrendCountPoint[] {
-    const countByDate = new Map(points.map((point) => [point.date, point.count]));
+    const countByDate = new Map(
+      points.map((point) => [point.date, point.count]),
+    );
 
     return dateKeys.map((date) => ({
       date,

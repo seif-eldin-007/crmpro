@@ -11,6 +11,7 @@ import type {
   PlatformAttentionItem,
   PlatformFailedImportItem,
   PlatformMrrByCurrency,
+  PlatformSystemHealth,
   PlatformUsageAtRiskTenant,
 } from './platform-analytics.types';
 
@@ -201,9 +202,9 @@ export class PlatformAnalyticsService {
       byStatus[row.status] = row._count._all;
     }
 
-    const systemHealth = {
-      status: (databaseUp ? 'ok' : 'degraded') as 'ok' | 'degraded',
-      database: (databaseUp ? 'up' : 'down') as 'up' | 'down',
+    const systemHealth: PlatformSystemHealth = {
+      status: databaseUp ? 'ok' : 'degraded',
+      database: databaseUp ? 'up' : 'down',
       checkedAt: now.toISOString(),
     };
 
@@ -298,7 +299,10 @@ export class PlatformAnalyticsService {
       discountPercent: number | null;
     }>,
   ): PlatformMrrByCurrency[] {
-    const byCurrency = new Map<string, { mrr: number; contractCount: number }>();
+    const byCurrency = new Map<
+      string,
+      { mrr: number; contractCount: number }
+    >();
 
     for (const contract of contracts) {
       const monthly = toMonthlyRevenue(
@@ -414,9 +418,7 @@ export class PlatformAnalyticsService {
           metric: 'storage',
           used: Number(tenant.storageUsedBytes),
           limit:
-            plan.maxStorageBytes === null
-              ? null
-              : Number(plan.maxStorageBytes),
+            plan.maxStorageBytes === null ? null : Number(plan.maxStorageBytes),
         },
       ];
 
@@ -436,9 +438,7 @@ export class PlatformAnalyticsService {
       }
     }
 
-    return atRisk
-      .sort((a, b) => b.percent - a.percent)
-      .slice(0, 8);
+    return atRisk.sort((a, b) => b.percent - a.percent).slice(0, 8);
   }
 
   private buildAttentionItems(input: {
@@ -456,7 +456,8 @@ export class PlatformAnalyticsService {
         id: 'database-down',
         severity: 'critical',
         title: 'Database unreachable',
-        description: 'Platform health check failed. Investigate connectivity now.',
+        description:
+          'Platform health check failed. Investigate connectivity now.',
         href: '/system',
         count: 1,
       });
@@ -478,7 +479,8 @@ export class PlatformAnalyticsService {
         id: 'usage-at-risk',
         severity: 'warning',
         title: 'Tenants near plan limits',
-        description: 'Usage at or above 90% — upgrade or intervene before hard limits.',
+        description:
+          'Usage at or above 90% — upgrade or intervene before hard limits.',
         href: '/dashboard',
         count: input.usageAtRisk,
       });
@@ -489,7 +491,8 @@ export class PlatformAnalyticsService {
         id: 'failed-imports',
         severity: 'warning',
         title: 'Failed imports (7d)',
-        description: 'Import jobs that failed or partially succeeded this week.',
+        description:
+          'Import jobs that failed or partially succeeded this week.',
         href: '/imports',
         count: input.failedImportsRecent,
       });
@@ -500,7 +503,8 @@ export class PlatformAnalyticsService {
         id: 'draft-contracts',
         severity: 'warning',
         title: 'Draft contracts awaiting activation',
-        description: 'Commercial deals still in draft — activate before provisioning.',
+        description:
+          'Commercial deals still in draft — activate before provisioning.',
         href: '/contracts?status=DRAFT',
         count: input.draftContracts,
       });

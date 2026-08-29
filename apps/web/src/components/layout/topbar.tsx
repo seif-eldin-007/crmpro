@@ -30,6 +30,8 @@ function CommandTrigger({ onOpen }: { onOpen?: () => void }) {
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
+    // Syncing external browser state once after mount to avoid SSR hydration mismatch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMac(/mac/i.test(navigator.platform));
   }, []);
 
@@ -145,6 +147,8 @@ function ThemeToggle() {
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark");
+    // Syncing external DOM state once after mount to avoid SSR hydration mismatch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(isDark ? "dark" : "light");
   }, []);
 
@@ -295,6 +299,8 @@ export function Topbar() {
 
   useEffect(() => {
     if (commandPaletteOpen) {
+      // Closing the mobile overlay is a reaction to the palette (external store) opening
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMobileOverlay(null);
     }
   }, [commandPaletteOpen]);

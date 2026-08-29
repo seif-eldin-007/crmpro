@@ -358,9 +358,7 @@ export class ContractsService {
     });
 
     if (existing) {
-      throw new BadRequestException(
-        'Tenant already has an active contract',
-      );
+      throw new BadRequestException('Tenant already has an active contract');
     }
   }
 

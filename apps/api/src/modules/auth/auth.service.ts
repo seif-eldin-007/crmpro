@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserSession } from '@crmpro/database';
 import { AuthLoggingService } from '../../common/logging/auth-logging.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -104,8 +101,16 @@ export class AuthService {
       session.hashedRefreshToken,
     );
     if (!tokenValid) {
+      // The session is still active but the presented token does not match
+      // the current rotation — a previously rotated token is being replayed.
+      // Treat this as token theft: revoke every session of the user.
+      await this.prisma.userSession.updateMany({
+        where: { userId: session.userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+
       this.authLoggingService.refreshFailure({
-        reason: 'invalid_token',
+        reason: 'refresh_token_reuse',
         sessionId: session.id,
       });
       throw new UnauthorizedException('Invalid refresh token');
@@ -282,7 +287,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const user = await this.usersService.findByTenantAndEmail(tenantSlug, email);
+    const user = await this.usersService.findByTenantAndEmail(
+      tenantSlug,
+      email,
+    );
     if (!user || user.deletedAt !== null || !user.isActive) {
       this.authLoggingService.loginFailure({
         email,

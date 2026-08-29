@@ -81,11 +81,7 @@ export class FilesController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    const data = await this.filesService.deleteFile(
-      id,
-      user.tenantId,
-      user.id,
-    );
+    const data = await this.filesService.deleteFile(id, user.tenantId, user.id);
 
     return { success: true, data };
   }

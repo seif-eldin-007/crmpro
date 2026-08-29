@@ -86,7 +86,7 @@ export interface LeadMutationResult {
   duplicateWarning: DuplicateWarning | null;
 }
 
-export interface CreateLeadResult extends LeadMutationResult {}
+export type CreateLeadResult = LeadMutationResult;
 
 export interface UpdateLeadInput {
   fullName?: string;

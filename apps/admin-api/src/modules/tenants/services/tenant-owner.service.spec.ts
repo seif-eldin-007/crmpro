@@ -11,6 +11,9 @@ describe('TenantOwnerService resetOwnerPassword', () => {
     ipAddress: '127.0.0.1',
     userAgent: 'jest',
     fingerprint: 'fp',
+    deviceName: null,
+    country: null,
+    city: null,
   };
 
   let tx: {
@@ -39,11 +42,15 @@ describe('TenantOwnerService resetOwnerPassword', () => {
         findFirst: jest.fn().mockResolvedValue({ id: 'tenant-1' }),
       },
       user: {
-        findMany: jest.fn().mockResolvedValue([
-          { id: 'owner-1', name: 'Owner', email: 'owner@test.com' },
-        ]),
+        findMany: jest
+          .fn()
+          .mockResolvedValue([
+            { id: 'owner-1', name: 'Owner', email: 'owner@test.com' },
+          ]),
       },
-      $transaction: jest.fn(async (callback) => callback(tx)),
+      $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
+        callback(tx),
+      ),
     };
 
     auditService = {
@@ -84,7 +91,7 @@ describe('TenantOwnerService resetOwnerPassword', () => {
     });
     expect(tx.userSession.updateMany).toHaveBeenCalledWith({
       where: { userId: 'owner-1', revokedAt: null },
-      data: { revokedAt: expect.any(Date) },
+      data: { revokedAt: expect.any(Date) as Date },
     });
     expect(auditService.logOwnerPasswordReset).toHaveBeenCalledWith(
       'admin-1',

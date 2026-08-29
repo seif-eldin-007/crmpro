@@ -23,12 +23,13 @@ describe('LeadsService quota enforcement', () => {
       lead: { findMany: jest.fn().mockResolvedValue([]) },
       user: { findFirst: jest.fn().mockResolvedValue(null) },
       leadSource: { findFirst: jest.fn() },
-      $transaction: jest.fn(async (callback) =>
-        callback({
-          lead: {
-            create: jest.fn().mockResolvedValue({ id: 'lead-1' }),
-          },
-        }),
+      $transaction: jest.fn(
+        (callback: (client: { lead: { create: jest.Mock } }) => unknown) =>
+          callback({
+            lead: {
+              create: jest.fn().mockResolvedValue({ id: 'lead-1' }),
+            },
+          }),
       ),
     };
 

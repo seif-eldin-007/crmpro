@@ -1,8 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  CLEANUP_SCHEDULER_HEALTH,
-} from '../../../common/health';
+import { CLEANUP_SCHEDULER_HEALTH } from '../../../common/health';
 import type { CleanupSchedulerHealthContributor } from '../../../common/health';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { StorageService } from '../../../common/storage/storage.service';
@@ -45,7 +43,8 @@ export class HealthCheckService {
       queues,
       cleanupScheduler,
       version: this.configService.get<string>('app.version') ?? '0.0.1',
-      environment: this.configService.get<string>('app.nodeEnv') ?? 'development',
+      environment:
+        this.configService.get<string>('app.nodeEnv') ?? 'development',
       uptimeSeconds: Math.floor((Date.now() - APP_START_TIME) / 1000),
     };
   }

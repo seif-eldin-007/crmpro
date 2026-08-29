@@ -26,7 +26,10 @@ describe('GlobalExceptionFilter (Admin API)', () => {
     }) as ArgumentsHost;
 
   it('returns standardized forbidden responses', () => {
-    filter.catch(new ForbiddenException('Insufficient permissions'), createHost());
+    filter.catch(
+      new ForbiddenException('Insufficient permissions'),
+      createHost(),
+    );
 
     expect(status).toHaveBeenCalledWith(403);
     expect(json).toHaveBeenCalledWith({

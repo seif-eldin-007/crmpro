@@ -1,9 +1,5 @@
 import { BadRequestException, ValidationPipeOptions } from '@nestjs/common';
-import {
-  API_ERROR_CODES,
-  formatValidationErrors,
-  type ValidationErrorLike,
-} from '@crmpro/shared/errors';
+import { API_ERROR_CODES, formatValidationErrors } from '@crmpro/shared/errors';
 import type { ValidationError } from 'class-validator';
 
 export function createValidationPipeOptions(
@@ -17,7 +13,7 @@ export function createValidationPipeOptions(
       new BadRequestException({
         code: API_ERROR_CODES.VALIDATION_ERROR,
         message: 'Validation failed',
-        details: formatValidationErrors(errors as ValidationErrorLike[]),
+        details: formatValidationErrors(errors),
       }),
     ...overrides,
   };

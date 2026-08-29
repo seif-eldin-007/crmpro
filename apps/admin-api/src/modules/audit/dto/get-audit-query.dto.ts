@@ -1,4 +1,10 @@
-import { IsISO8601, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsISO8601,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator';
 import { ListQueryDto } from '../../../common/query/dto/list-query.dto';
 
 export class GetAuditQueryDto extends ListQueryDto {

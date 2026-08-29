@@ -65,6 +65,8 @@ export function CreateTenantForm() {
 
   useEffect(() => {
     if (!slugTouched) {
+      // Deriving the slug from the workspace name until the user edits it manually
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSlug(slugifyName(name));
     }
   }, [name, slugTouched]);

@@ -84,7 +84,7 @@ export function RolesPage() {
               Failed to load roles
             </CardTitle>
             <CardDescription>
-              We couldn't fetch your roles. Check your connection and try again.
+              We couldn&apos;t fetch your roles. Check your connection and try again.
             </CardDescription>
           </CardHeader>
           <CardContent>

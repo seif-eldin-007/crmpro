@@ -20,7 +20,9 @@ describe('CleanupProcessor', () => {
     };
 
     const bullService = {
-      getConnectionOptions: jest.fn().mockReturnValue({ host: 'localhost', port: 6379 }),
+      getConnectionOptions: jest
+        .fn()
+        .mockReturnValue({ host: 'localhost', port: 6379 }),
       getPrefix: jest.fn().mockReturnValue('crmpro'),
       getCleanupConcurrency: jest.fn().mockReturnValue(1),
     };
@@ -47,7 +49,9 @@ describe('CleanupProcessor', () => {
   it('executes cleanup through CleanupService', async () => {
     await (
       processor as unknown as {
-        handleJob: (job: { data: { jobName: CleanupJobName } }) => Promise<void>;
+        handleJob: (job: {
+          data: { jobName: CleanupJobName };
+        }) => Promise<void>;
       }
     ).handleJob({
       data: { jobName: CleanupJobName.STALE_EXPORT_JOBS },

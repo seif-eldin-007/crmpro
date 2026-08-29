@@ -1,5 +1,9 @@
 import { Prisma } from '@crmpro/database';
-import type { PlanDetail, PlanFeatureFlags, PlanListItem } from '../types/plan.types';
+import type {
+  PlanDetail,
+  PlanFeatureFlags,
+  PlanListItem,
+} from '../types/plan.types';
 
 type PlanRecord = {
   id: string;

@@ -12,14 +12,14 @@ export class CreateProjectDto {
   @IsUUID()
   developerId: string;
 
-  @Transform(({ value }) => normalizeWhitespace(value))
+  @Transform(({ value }: { value: unknown }) => normalizeWhitespace(value))
   @IsString()
   @MinLength(2)
   @MaxLength(150)
   name: string;
 
   @IsOptional()
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim() || undefined : value,
   )
   @IsString()

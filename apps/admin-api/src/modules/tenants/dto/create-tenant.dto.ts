@@ -18,7 +18,9 @@ export class CreateTenantDto {
   @IsString()
   @MinLength(2)
   @MaxLength(150)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   name: string;
 
   @IsString()
@@ -28,7 +30,7 @@ export class CreateTenantDto {
     message:
       'Slug must be lowercase kebab-case (letters, numbers, hyphens only)',
   })
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   slug: string;
@@ -36,12 +38,14 @@ export class CreateTenantDto {
   @IsString()
   @MinLength(2)
   @MaxLength(120)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   ownerFullName: string;
 
   @IsEmail()
   @MaxLength(255)
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,
   )
   ownerEmail: string;

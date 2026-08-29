@@ -26,7 +26,6 @@ import {
   PERMISSION_DESCRIPTIONS,
   type PermissionGroupKey,
 } from "@/features/roles/utils/permission-catalog";
-import { formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -76,6 +75,8 @@ function RoleDetailContent({
   // Re-initialize state if role changes
   const [selectedKeys, setSelectedKeys] = useState(role.permissionKeys);
   useEffect(() => {
+    // Re-syncing editable selection when the displayed role changes
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedKeys(role.permissionKeys);
   }, [role.permissionKeys]);
 

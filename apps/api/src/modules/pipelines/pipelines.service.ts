@@ -12,11 +12,7 @@ import {
   getPaginationParams,
   PaginatedResponse,
 } from '../../common/pagination';
-import {
-  buildOrderBy,
-  normalizeSearch,
-  SortOrder,
-} from '../../common/query';
+import { buildOrderBy, normalizeSearch, SortOrder } from '../../common/query';
 import { CreatePipelineDto } from './dto/create-pipeline.dto';
 import { CreateStageDto } from './dto/create-stage.dto';
 import { ListPipelinesQueryDto } from './dto/list-pipelines-query.dto';
@@ -125,10 +121,7 @@ export class PipelinesService {
     );
   }
 
-  async getPipeline(
-    id: string,
-    tenantId: string,
-  ): Promise<PipelineResponse> {
+  async getPipeline(id: string, tenantId: string): Promise<PipelineResponse> {
     const pipeline = await this.getPipelineOrThrow(id, tenantId);
     const stageLeadCounts = await this.loadStageLeadCounts(tenantId, [
       pipeline.id,
@@ -213,7 +206,9 @@ export class PipelinesService {
           where: { id: pipeline.id },
           data: {
             ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
-            ...(dto.isDefault !== undefined ? { isDefault: dto.isDefault } : {}),
+            ...(dto.isDefault !== undefined
+              ? { isDefault: dto.isDefault }
+              : {}),
           },
           include: pipelineInclude,
         });
@@ -229,10 +224,7 @@ export class PipelinesService {
     }
   }
 
-  async deletePipeline(
-    id: string,
-    tenantId: string,
-  ): Promise<{ id: string }> {
+  async deletePipeline(id: string, tenantId: string): Promise<{ id: string }> {
     const pipeline = await this.getPipelineOrThrow(id, tenantId);
     await this.ensurePipelineCanBeDeleted(pipeline);
 
@@ -263,11 +255,7 @@ export class PipelinesService {
     try {
       const stage = await this.prisma.$transaction(async (tx) => {
         if (closeType) {
-          await this.ensureUniqueClosedStageInTx(
-            tx,
-            pipeline.id,
-            closeType,
-          );
+          await this.ensureUniqueClosedStageInTx(tx, pipeline.id, closeType);
         }
 
         await this.shiftStagesOnInsert(tx, pipeline.id, dto.sortOrder);
@@ -342,10 +330,7 @@ export class PipelinesService {
           );
         }
 
-        if (
-          dto.sortOrder !== undefined &&
-          nextSortOrder !== stage.sortOrder
-        ) {
+        if (dto.sortOrder !== undefined && nextSortOrder !== stage.sortOrder) {
           await this.reorderStage(
             tx,
             pipelineId,
@@ -393,7 +378,9 @@ export class PipelinesService {
     });
 
     if (stageCount <= 1) {
-      throw new BadRequestException('Cannot delete the last stage of a pipeline');
+      throw new BadRequestException(
+        'Cannot delete the last stage of a pipeline',
+      );
     }
 
     const leadsUsingStage = await this.prisma.lead.count({
@@ -411,11 +398,7 @@ export class PipelinesService {
         where: { id: stage.id },
       });
 
-      await this.compactStagesAfterDelete(
-        tx,
-        pipelineId,
-        stage.sortOrder,
-      );
+      await this.compactStagesAfterDelete(tx, pipelineId, stage.sortOrder);
     }, STAGE_TRANSACTION_OPTIONS);
 
     void this.domainEventBus.publish(
@@ -683,9 +666,7 @@ export class PipelinesService {
     });
 
     if (leadCount > 0) {
-      throw new BadRequestException(
-        'Cannot delete a pipeline that has leads',
-      );
+      throw new BadRequestException('Cannot delete a pipeline that has leads');
     }
   }
 
@@ -717,9 +698,7 @@ export class PipelinesService {
       _count: { _all: true },
     });
 
-    return new Map(
-      counts.map((row) => [row.pipelineStageId, row._count._all]),
-    );
+    return new Map(counts.map((row) => [row.pipelineStageId, row._count._all]));
   }
 
   private toPipelineResponse(

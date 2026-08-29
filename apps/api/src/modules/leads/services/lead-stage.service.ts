@@ -110,7 +110,9 @@ export class LeadStageService {
       throw new NotFoundException('Lead not found');
     }
 
-    void this.domainEventBus.publish(new LeadMovedStageEvent(tenantId, lead.id));
+    void this.domainEventBus.publish(
+      new LeadMovedStageEvent(tenantId, lead.id),
+    );
 
     if (updatedLead.assignedUser) {
       void this.notificationTrigger.notifyLeadStageChanged({

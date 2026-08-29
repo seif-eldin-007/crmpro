@@ -47,7 +47,7 @@ export function CreateLeadDialog() {
   const [pipelineId, setPipelineId] = useState<string>();
   const [pipelineStageId, setPipelineStageId] = useState<string>();
 
-  const pipelineOptions = pipelines.data ?? [];
+  const pipelineOptions = useMemo(() => pipelines.data ?? [], [pipelines.data]);
 
   const stageOptions = useMemo(() => {
     if (!pipelineId) return [];
@@ -64,6 +64,8 @@ export function CreateLeadDialog() {
     const placement = getDefaultPipelinePlacement(pipelineOptions);
 
     if (placement) {
+      // Resetting form defaults when the dialog opens with freshly loaded pipelines
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPipelineId(placement.pipelineId);
       setPipelineStageId(placement.pipelineStageId);
     }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LeadStatus, PipelineCloseType } from '@crmpro/database';
+import { LeadStatus } from '@crmpro/database';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { STALE_LEAD_DAYS } from '../analytics.constants';
 import type {

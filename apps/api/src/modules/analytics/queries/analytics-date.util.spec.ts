@@ -10,7 +10,10 @@ import {
 describe('analytics-date.util', () => {
   describe('parseAnalyticsDateRange', () => {
     it('returns empty range when dates are omitted', () => {
-      expect(parseAnalyticsDateRange({})).toEqual({ from: undefined, to: undefined });
+      expect(parseAnalyticsDateRange({})).toEqual({
+        from: undefined,
+        to: undefined,
+      });
     });
 
     it('parses ISO dates', () => {
@@ -24,9 +27,9 @@ describe('analytics-date.util', () => {
     });
 
     it('rejects invalid dates', () => {
-      expect(() =>
-        parseAnalyticsDateRange({ from: 'not-a-date' }),
-      ).toThrow(BadRequestException);
+      expect(() => parseAnalyticsDateRange({ from: 'not-a-date' })).toThrow(
+        BadRequestException,
+      );
     });
 
     it('rejects impossible ranges', () => {
@@ -48,15 +51,22 @@ describe('analytics-date.util', () => {
       const from = new Date('2026-01-01T00:00:00.000Z');
       const to = new Date('2026-06-30T23:59:59.999Z');
 
-      expect(buildLeadCreatedAtFilter({ from, to })).toEqual({ gte: from, lte: to });
+      expect(buildLeadCreatedAtFilter({ from, to })).toEqual({
+        gte: from,
+        lte: to,
+      });
     });
   });
 
   describe('UTC helpers', () => {
     it('computes month boundaries in UTC', () => {
       const date = new Date('2026-06-15T12:00:00.000Z');
-      expect(startOfUtcDay(date).toISOString()).toBe('2026-06-15T00:00:00.000Z');
-      expect(startOfUtcMonth(date).toISOString()).toBe('2026-06-01T00:00:00.000Z');
+      expect(startOfUtcDay(date).toISOString()).toBe(
+        '2026-06-15T00:00:00.000Z',
+      );
+      expect(startOfUtcMonth(date).toISOString()).toBe(
+        '2026-06-01T00:00:00.000Z',
+      );
       expect(subtractUtcMonths(startOfUtcMonth(date), 11).toISOString()).toBe(
         '2025-07-01T00:00:00.000Z',
       );

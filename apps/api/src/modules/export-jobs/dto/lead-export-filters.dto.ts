@@ -1,6 +1,12 @@
 import { LeadStatus } from '@crmpro/database';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator';
 import { normalizeSearchInput } from '../../../common/query/utils/search.util';
 
 export class LeadExportFiltersDto {

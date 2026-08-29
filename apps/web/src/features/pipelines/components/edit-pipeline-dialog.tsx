@@ -36,6 +36,8 @@ export function EditPipelineDialog() {
 
   useEffect(() => {
     if (!pipeline) return;
+    // Hydrating the form from the selected pipeline when the dialog opens
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(pipeline.name);
     setIsDefault(pipeline.isDefault);
   }, [pipeline]);

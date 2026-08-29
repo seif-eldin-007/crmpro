@@ -45,22 +45,16 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<DashboardOverviewData>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.overview,
-      range,
-      () => this.overviewService.getOverview(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.overview, range, () =>
+      this.overviewService.getOverview(tenantId, range),
     );
   }
 
   getPipelineAnalytics(
     tenantId: string,
   ): Promise<AnalyticsCacheResult<PipelineAnalyticsData>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.pipeline,
-      {},
-      () => this.pipelineService.getPipeline(tenantId),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.pipeline, {}, () =>
+      this.pipelineService.getPipeline(tenantId),
     );
   }
 
@@ -68,22 +62,16 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<TrendAnalyticsData>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.trends,
-      range,
-      () => this.trendService.getTrends(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.trends, range, () =>
+      this.trendService.getTrends(tenantId, range),
     );
   }
 
   getTeamAnalytics(
     tenantId: string,
   ): Promise<AnalyticsCacheResult<TeamAnalyticsData>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.team,
-      {},
-      () => this.teamService.getTeam(tenantId),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.team, {}, () =>
+      this.teamService.getTeam(tenantId),
     );
   }
 
@@ -104,11 +92,8 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<PipelineFunnelAnalytics[]>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.pipeline,
-      range,
-      () => this.queryService.getPipelineFunnel(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.pipeline, range, () =>
+      this.queryService.getPipelineFunnel(tenantId, range),
     );
   }
 
@@ -116,11 +101,8 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<LeadSourceAnalytics[]>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.sources,
-      range,
-      () => this.queryService.getLeadSources(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.sources, range, () =>
+      this.queryService.getLeadSources(tenantId, range),
     );
   }
 
@@ -128,11 +110,8 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<AgentPerformanceAnalytics[]>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.agents,
-      range,
-      () => this.queryService.getAgentPerformance(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.agents, range, () =>
+      this.queryService.getAgentPerformance(tenantId, range),
     );
   }
 
@@ -140,11 +119,8 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<ProjectPerformanceAnalytics[]>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.projects,
-      range,
-      () => this.queryService.getProjectPerformance(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.projects, range, () =>
+      this.queryService.getProjectPerformance(tenantId, range),
     );
   }
 
@@ -152,11 +128,8 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<DeveloperPerformanceAnalytics[]>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.developers,
-      range,
-      () => this.queryService.getDeveloperPerformance(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.developers, range, () =>
+      this.queryService.getDeveloperPerformance(tenantId, range),
     );
   }
 
@@ -164,11 +137,8 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<LeadTrendPoint[]>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.trends,
-      range,
-      () => this.queryService.getLeadTrends(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.trends, range, () =>
+      this.queryService.getLeadTrends(tenantId, range),
     );
   }
 
@@ -176,11 +146,8 @@ export class AnalyticsService {
     tenantId: string,
     range: AnalyticsDateRange,
   ): Promise<AnalyticsCacheResult<LeadStatusDistribution>> {
-    return this.withCache(
-      tenantId,
-      ANALYTICS_ENDPOINTS.status,
-      range,
-      () => this.queryService.getStatusDistribution(tenantId, range),
+    return this.withCache(tenantId, ANALYTICS_ENDPOINTS.status, range, () =>
+      this.queryService.getStatusDistribution(tenantId, range),
     );
   }
 

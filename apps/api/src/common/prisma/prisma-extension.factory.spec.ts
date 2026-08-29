@@ -58,9 +58,11 @@ describe('createSlowQueryExtension', () => {
     const loggingService = { warn: jest.fn() };
     const configService = { get: jest.fn().mockReturnValue(true) };
 
-    expect(createSlowQueryExtension(
-      loggingService as unknown as LoggingService,
-      configService as unknown as ConfigService,
-    )).toBeDefined();
+    expect(
+      createSlowQueryExtension(
+        loggingService as unknown as LoggingService,
+        configService as unknown as ConfigService,
+      ),
+    ).toBeDefined();
   });
 });

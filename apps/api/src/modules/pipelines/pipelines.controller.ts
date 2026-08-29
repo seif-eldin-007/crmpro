@@ -11,10 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PERMISSIONS } from '@crmpro/shared/auth';
-import {
-  PermissionsGuard,
-  RequirePermission,
-} from '../../common/auth';
+import { PermissionsGuard, RequirePermission } from '../../common/auth';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/jwt-payload.type';
@@ -61,10 +58,7 @@ export class PipelinesController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CreatePipelineDto,
   ) {
-    const data = await this.pipelinesService.createPipeline(
-      user.tenantId,
-      dto,
-    );
+    const data = await this.pipelinesService.createPipeline(user.tenantId, dto);
 
     return { success: true, data };
   }

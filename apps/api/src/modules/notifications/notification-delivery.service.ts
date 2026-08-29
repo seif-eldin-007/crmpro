@@ -9,11 +9,12 @@ import {
 } from './entities/notification.types';
 import { NotificationMetricsStore } from './metrics/notification-metrics.store';
 import { NotificationTemplateService } from './notification-template.service';
-import { normalizeMetadata, resolvePriority } from './mappers/notification.mapper';
-import { CacheService } from '../../common/cache/cache.service';
 import {
-  TenantStatusService,
-} from '../../common/tenant/tenant-status.service';
+  normalizeMetadata,
+  resolvePriority,
+} from './mappers/notification.mapper';
+import { CacheService } from '../../common/cache/cache.service';
+import { TenantStatusService } from '../../common/tenant/tenant-status.service';
 
 @Injectable()
 export class NotificationDeliveryService {

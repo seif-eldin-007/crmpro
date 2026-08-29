@@ -59,12 +59,20 @@ describe('ExportJobsService job claiming', () => {
         { provide: CsvExportService, useValue: csvExportService },
         { provide: QueueService, useValue: {} },
         { provide: DomainEventBus, useValue: { publish: jest.fn() } },
-        { provide: NotificationTriggerService, useValue: { notifyExportCompleted: jest.fn() } },
+        {
+          provide: NotificationTriggerService,
+          useValue: { notifyExportCompleted: jest.fn() },
+        },
         {
           provide: TenantStatusService,
-          useValue: { assertTenantActive: jest.fn().mockResolvedValue(undefined) },
+          useValue: {
+            assertTenantActive: jest.fn().mockResolvedValue(undefined),
+          },
         },
-        { provide: AuditWriterService, useValue: { createAuditLog: jest.fn() } },
+        {
+          provide: AuditWriterService,
+          useValue: { createAuditLog: jest.fn() },
+        },
       ],
     }).compile();
 

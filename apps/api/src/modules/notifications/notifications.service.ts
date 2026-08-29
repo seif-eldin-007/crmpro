@@ -3,12 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import {
-  NotificationPriority,
-  NotificationStatus,
-  NotificationType,
-  Prisma,
-} from '@crmpro/database';
+import { NotificationStatus, Prisma } from '@crmpro/database';
 import {
   buildPaginatedResponse,
   getPaginationParams,
@@ -142,7 +137,10 @@ export class NotificationsService {
     return toNotificationResponse(updated);
   }
 
-  async markAllAsRead(tenantId: string, userId: string): Promise<{ updated: number }> {
+  async markAllAsRead(
+    tenantId: string,
+    userId: string,
+  ): Promise<{ updated: number }> {
     const result = await this.prisma.notification.updateMany({
       where: {
         tenantId,

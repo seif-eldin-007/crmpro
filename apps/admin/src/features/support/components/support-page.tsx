@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ADMIN_PERMISSIONS } from "@crmpro/shared";
 import { AppIcons } from "@/components/icons/app-icons";
@@ -59,7 +59,7 @@ export function SupportPage() {
       { enabled: canAccess },
     );
 
-  const conversations = data?.items ?? [];
+  const conversations = useMemo(() => data?.items ?? [], [data?.items]);
 
   useEffect(() => {
     if (!selectedId && conversations.length > 0) {
@@ -246,9 +246,11 @@ function AdminThreadPane({ conversationId }: { conversationId: string }) {
 
   useEffect(() => {
     const saved = localStorage.getItem(draftKey);
+    // Loading the persisted draft for the newly selected conversation (external storage sync)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setDraft(saved);
     else setDraft("");
-  }, [conversationId]);
+  }, [conversationId, draftKey]);
 
   useEffect(() => {
     if (draft.trim()) {
@@ -281,10 +283,10 @@ function AdminThreadPane({ conversationId }: { conversationId: string }) {
   const handleDraftChange = (val: string) => {
     setDraft(val);
     if (socket) {
-      socket.emit('typing', { conversationId, userId: data?.createdByUser?.id, isTyping: true });
+      socket.emit('typing', { conversationId, isTyping: true });
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = setTimeout(() => {
-        socket.emit('typing', { conversationId, userId: data?.createdByUser?.id, isTyping: false });
+        socket.emit('typing', { conversationId, isTyping: false });
       }, 2000);
     }
   };
@@ -430,8 +432,8 @@ function AdminThreadPane({ conversationId }: { conversationId: string }) {
           <div className="flex gap-2">
             <Input
               value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              placeholder="Reply to the agency user…"
+              onChange={(event) => handleDraftChange(event.target.value)}
+              placeholder={isUserTyping ? "User is typing…" : "Reply to the agency user…"}
               maxLength={10000}
               onKeyDown={(event) => {
                 if (event.key === "Enter" && !event.shiftKey) {

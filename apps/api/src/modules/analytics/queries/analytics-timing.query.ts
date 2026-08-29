@@ -26,7 +26,12 @@ export function buildLeadCreatedAtSql(
 }
 
 export async function queryAvgResponseTimeHours(
-  prisma: { $queryRaw: <T>(query: TemplateStringsArray | Prisma.Sql, ...values: unknown[]) => Promise<T> },
+  prisma: {
+    $queryRaw: <T>(
+      query: TemplateStringsArray | Prisma.Sql,
+      ...values: unknown[]
+    ) => Promise<T>;
+  },
   tenantId: string,
   range: AnalyticsDateRange,
 ): Promise<number | null> {
@@ -52,7 +57,12 @@ export async function queryAvgResponseTimeHours(
 }
 
 export async function queryAvgLeadAgeDays(
-  prisma: { $queryRaw: <T>(query: TemplateStringsArray | Prisma.Sql, ...values: unknown[]) => Promise<T> },
+  prisma: {
+    $queryRaw: <T>(
+      query: TemplateStringsArray | Prisma.Sql,
+      ...values: unknown[]
+    ) => Promise<T>;
+  },
   tenantId: string,
   range: AnalyticsDateRange,
 ): Promise<number | null> {
@@ -81,7 +91,12 @@ export interface AgentTimingRow {
 }
 
 export async function queryAgentTimingMetrics(
-  prisma: { $queryRaw: <T>(query: TemplateStringsArray | Prisma.Sql, ...values: unknown[]) => Promise<T> },
+  prisma: {
+    $queryRaw: <T>(
+      query: TemplateStringsArray | Prisma.Sql,
+      ...values: unknown[]
+    ) => Promise<T>;
+  },
   tenantId: string,
   range: AnalyticsDateRange,
 ): Promise<AgentTimingRow[]> {

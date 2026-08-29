@@ -1,0 +1,70 @@
+# CRMPro CI — quality gates from docs/plans/02-quality-gates.md
+#
+# Branch protection guidance (manual GitHub settings, one-time):
+#   Settings → Branches → Add rule for `main` (and `develop`):
+#   - Require status check "ci / Lint, typecheck & test" to pass before merging
+#   - Require branches to be up to date before merging
+#   - Require approval from at least one reviewer (optional while solo)
+#   - Include administrators
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, typecheck & test
+    runs-on: ubuntu-latest
+    # Postgres service for any DB-touching tests (unit suites are mocked today;
+    # integration suites from later plans will use this container directly).
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: crmpro
+          POSTGRES_PASSWORD: crmpro
+          POSTGRES_DB: crmpro
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U crmpro"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://crmpro:crmpro@localhost:5432/crmpro?schema=public
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # pnpm version is resolved from the `packageManager` field in package.json
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (turbo cached)
+        run: pnpm build
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test

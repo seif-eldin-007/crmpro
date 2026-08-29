@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import type { AuthStatus, AuthUser, AuthUserRole } from "@/types/auth";
-import { setStoredRefreshToken } from "@/lib/api/refresh-token";
 
 interface AuthState {
   status: AuthStatus;
@@ -34,7 +33,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   setRole: (role) => set({ role }),
   setPermissions: (permissions) => set({ permissions }),
   clearAuth: () => {
-    setStoredRefreshToken(null);
     set({
       status: "unauthenticated",
       accessToken: null,

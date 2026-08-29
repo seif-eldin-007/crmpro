@@ -6,9 +6,7 @@ import {
 import { CleanupSchedulerService } from './cleanup-scheduler.service';
 
 @Injectable()
-export class CleanupSchedulerHealthProvider
-  implements CleanupSchedulerHealthContributor
-{
+export class CleanupSchedulerHealthProvider implements CleanupSchedulerHealthContributor {
   constructor(
     private readonly cleanupSchedulerService: CleanupSchedulerService,
   ) {}

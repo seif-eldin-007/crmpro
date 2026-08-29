@@ -1,10 +1,3 @@
-type QueryParamValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined;
-
 /**
  * Converts a params object into clean API query values (omits undefined/null/empty).
  */

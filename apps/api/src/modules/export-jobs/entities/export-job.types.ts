@@ -1,8 +1,4 @@
-import {
-  ExportFormat,
-  ExportType,
-  JobStatus,
-} from '@crmpro/database';
+import { ExportFormat, ExportType, JobStatus } from '@crmpro/database';
 import { LeadExportParams } from '../../leads/types/lead.types';
 
 export interface ExportJobFileSummary {

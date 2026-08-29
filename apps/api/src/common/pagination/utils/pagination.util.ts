@@ -26,8 +26,7 @@ export function buildPaginationMeta(
   limit: number,
   totalItems: number,
 ): PaginationMeta {
-  const totalPages =
-    totalItems === 0 ? 0 : Math.ceil(totalItems / limit);
+  const totalPages = totalItems === 0 ? 0 : Math.ceil(totalItems / limit);
 
   return {
     page,

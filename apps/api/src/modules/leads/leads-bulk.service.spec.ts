@@ -52,7 +52,9 @@ describe('LeadsBulkService', () => {
     expect(result.failureCount).toBe(0);
     expect(auditWriter.createAuditLog).toHaveBeenCalledWith(
       expect.objectContaining({
-        metadata: expect.objectContaining({ leadCount: 2 }),
+        metadata: expect.objectContaining({
+          leadCount: 2,
+        }) as Record<string, unknown>,
       }),
     );
   });

@@ -99,11 +99,7 @@ export class SupportController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    const data = await this.supportService.resolve(
-      user.tenantId,
-      user.id,
-      id,
-    );
+    const data = await this.supportService.resolve(user.tenantId, user.id, id);
     return { success: true, data };
   }
 }

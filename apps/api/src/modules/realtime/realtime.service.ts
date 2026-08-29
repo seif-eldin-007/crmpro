@@ -7,6 +7,11 @@ import {
 } from '../../common/events/domain-event.types';
 import { RealtimeGateway } from './realtime.gateway';
 
+interface RealtimePayload {
+  event: string;
+  data: unknown;
+}
+
 @Injectable()
 export class RealtimeService implements OnModuleInit, OnModuleDestroy {
   constructor(
@@ -30,20 +35,20 @@ export class RealtimeService implements OnModuleInit, OnModuleDestroy {
       (event: SupportMessageCreatedEvent) => {
         this.notifyUser(event.userId, {
           event: 'invalidate',
-          data: { 
-            entity: 'support-messages', 
-            conversationId: event.conversationId, 
-            actorId: event.actorId 
+          data: {
+            entity: 'support-messages',
+            conversationId: event.conversationId,
+            actorId: event.actorId,
           },
         });
-        
+
         // Notify admins
         this.notifyAdmins({
           event: 'invalidate',
-          data: { 
-            entity: 'support-messages', 
-            conversationId: event.conversationId, 
-            actorId: event.actorId 
+          data: {
+            entity: 'support-messages',
+            conversationId: event.conversationId,
+            actorId: event.actorId,
           },
         });
       },
@@ -54,11 +59,11 @@ export class RealtimeService implements OnModuleInit, OnModuleDestroy {
     // cleanup if needed
   }
 
-  notifyUser(userId: string, payload: any) {
+  notifyUser(userId: string, payload: RealtimePayload) {
     this.gateway.server.to(`user:${userId}`).emit(payload.event, payload.data);
   }
 
-  notifyAdmins(payload: any) {
+  notifyAdmins(payload: RealtimePayload) {
     this.gateway.server.to('admin-broadcast').emit(payload.event, payload.data);
   }
 }

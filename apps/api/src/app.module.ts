@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { HttpLoggingInterceptor } from './common/logging/interceptors/http-logging.interceptor';
 import { CacheModule } from './common/cache/cache.module';
@@ -40,6 +41,10 @@ import { envValidationSchema } from './config/env.validation';
       load: [configuration],
       validationSchema: envValidationSchema,
     }),
+    ThrottlerModule.forRoot([
+      { name: 'default', ttl: 60_000, limit: 100 },
+      { name: 'hourly', ttl: 3_600_000, limit: 2_000 },
+    ]),
     LoggingModule,
     DomainEventsModule,
     CacheModule,
@@ -77,6 +82,10 @@ import { envValidationSchema } from './config/env.validation';
     {
       provide: APP_INTERCEPTOR,
       useClass: HttpLoggingInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { BullService } from '../bull/bull.service';
-import { CLEANUP_QUEUE, EXPORT_QUEUE, IMPORT_QUEUE } from '../bull/bull.constants';
+import {
+  CLEANUP_QUEUE,
+  EXPORT_QUEUE,
+  IMPORT_QUEUE,
+} from '../bull/bull.constants';
 import { BackgroundJobPayload, CleanupJobPayload } from '../bull/bull.types';
 import { CleanupJobName } from '../../cleanup/cleanup.constants';
 import { RequestContextService } from '../../../common/logging/request-context.service';
@@ -24,9 +28,11 @@ export class QueueService {
   async enqueueImportJob(jobId: string): Promise<void> {
     const payload = this.buildBackgroundPayload(jobId);
 
-    await this.bullService.getQueue(IMPORT_QUEUE).add('process-import', payload, {
-      jobId,
-    });
+    await this.bullService
+      .getQueue(IMPORT_QUEUE)
+      .add('process-import', payload, {
+        jobId,
+      });
 
     this.workerLoggingService.queued({
       queue: IMPORT_QUEUE,
@@ -40,9 +46,11 @@ export class QueueService {
   async enqueueExportJob(jobId: string): Promise<void> {
     const payload = this.buildBackgroundPayload(jobId);
 
-    await this.bullService.getQueue(EXPORT_QUEUE).add('process-export', payload, {
-      jobId,
-    });
+    await this.bullService
+      .getQueue(EXPORT_QUEUE)
+      .add('process-export', payload, {
+        jobId,
+      });
 
     this.workerLoggingService.queued({
       queue: EXPORT_QUEUE,

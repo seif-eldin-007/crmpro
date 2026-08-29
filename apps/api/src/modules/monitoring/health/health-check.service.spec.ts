@@ -13,7 +13,9 @@ describe('HealthCheckService', () => {
         HealthCheckService,
         {
           provide: PrismaService,
-          useValue: { $queryRaw: jest.fn().mockResolvedValue([{ '?column?': 1 }]) },
+          useValue: {
+            $queryRaw: jest.fn().mockResolvedValue([{ '?column?': 1 }]),
+          },
         },
         {
           provide: BullService,

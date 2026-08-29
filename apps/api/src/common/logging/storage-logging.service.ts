@@ -61,10 +61,7 @@ export class StorageLoggingService {
     this.log('file_deleted', params);
   }
 
-  orphanCleanup(params: {
-    objectKey: string;
-    durationMs?: number;
-  }): void {
+  orphanCleanup(params: { objectKey: string; durationMs?: number }): void {
     this.log('orphan_cleanup', params);
   }
 
@@ -80,10 +77,13 @@ export class StorageLoggingService {
     const entry = {
       module: 'Storage',
       operation,
-      tenantId: typeof metadata.tenantId === 'string' ? metadata.tenantId : undefined,
+      tenantId:
+        typeof metadata.tenantId === 'string' ? metadata.tenantId : undefined,
       userId: typeof metadata.userId === 'string' ? metadata.userId : undefined,
       durationMs:
-        typeof metadata.durationMs === 'number' ? metadata.durationMs : undefined,
+        typeof metadata.durationMs === 'number'
+          ? metadata.durationMs
+          : undefined,
       status: operation,
       metadata,
     };

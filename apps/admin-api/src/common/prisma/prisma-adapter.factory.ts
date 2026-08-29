@@ -29,11 +29,13 @@ function serializeTransactionQueryable<T extends object>(target: T): T {
 
   return new Proxy(target, {
     get(tx, prop, receiver) {
-      const value = Reflect.get(tx, prop, receiver);
+      const value: unknown = Reflect.get(tx, prop, receiver);
 
       if (prop === 'queryRaw' || prop === 'executeRaw') {
         return (...args: unknown[]) =>
-          enqueue(() => (value as (...a: unknown[]) => Promise<unknown>).apply(tx, args));
+          enqueue(() =>
+            (value as (...a: unknown[]) => Promise<unknown>).apply(tx, args),
+          );
       }
 
       if (typeof value === 'function') {
@@ -51,7 +53,7 @@ export function createPrismaPgAdapter(pool: Pool): PrismaPg {
   // there, not on the factory.
   return new Proxy(new PrismaPg(pool), {
     get(factory, prop, receiver) {
-      const value = Reflect.get(factory, prop, receiver);
+      const value: unknown = Reflect.get(factory, prop, receiver);
 
       if (prop === 'connect') {
         return async (...args: unknown[]) => {
@@ -60,15 +62,18 @@ export function createPrismaPgAdapter(pool: Pool): PrismaPg {
           ).apply(factory, args);
           return new Proxy(adapter, {
             get(inner, innerProp, innerReceiver) {
-              const innerValue = Reflect.get(inner, innerProp, innerReceiver);
+              const innerValue: unknown = Reflect.get(
+                inner,
+                innerProp,
+                innerReceiver,
+              );
 
               if (innerProp === 'startTransaction') {
                 return async (...txArgs: unknown[]) =>
                   serializeTransactionQueryable(
-                    await (innerValue as (...a: unknown[]) => Promise<object>).apply(
-                      inner,
-                      txArgs,
-                    ),
+                    await (
+                      innerValue as (...a: unknown[]) => Promise<object>
+                    ).apply(inner, txArgs),
                   );
               }
 

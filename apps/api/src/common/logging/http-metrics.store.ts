@@ -36,9 +36,7 @@ export class HttpMetricsStore {
       errorRate:
         this.totalRequests === 0
           ? 0
-          : Number(
-              ((this.totalErrors / this.totalRequests) * 100).toFixed(1),
-            ),
+          : Number(((this.totalErrors / this.totalRequests) * 100).toFixed(1)),
     };
   }
 

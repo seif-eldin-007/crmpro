@@ -1,6 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { API_ERROR_CODES, mapExceptionToApiErrorResponse } from '@crmpro/shared/errors';
+import {
+  API_ERROR_CODES,
+  mapExceptionToApiErrorResponse,
+} from '@crmpro/shared/errors';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { PublicController } from './public.controller';
 import { PublicService } from './public.service';
@@ -21,10 +24,7 @@ describe('PublicService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        PublicService,
-        { provide: PrismaService, useValue: prisma },
-      ],
+      providers: [PublicService, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     service = module.get(PublicService);
@@ -36,7 +36,9 @@ describe('PublicService', () => {
       slug: 'prime-estates',
     });
 
-    await expect(service.lookupWorkspaceBySlug('prime-estates')).resolves.toEqual({
+    await expect(
+      service.lookupWorkspaceBySlug('prime-estates'),
+    ).resolves.toEqual({
       exists: true,
       name: 'Prime Estates',
       slug: 'prime-estates',
@@ -76,7 +78,9 @@ describe('PublicService', () => {
       slug: 'suspended-co',
     });
 
-    await expect(service.lookupWorkspaceBySlug('suspended-co')).resolves.toEqual({
+    await expect(
+      service.lookupWorkspaceBySlug('suspended-co'),
+    ).resolves.toEqual({
       exists: true,
       name: 'Suspended Co',
       slug: 'suspended-co',
@@ -87,9 +91,9 @@ describe('PublicService', () => {
   it('throws NOT_FOUND for a soft-deleted tenant', async () => {
     prisma.tenant.findFirst.mockResolvedValue(null);
 
-    await expect(service.lookupWorkspaceBySlug('deleted-workspace')).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.lookupWorkspaceBySlug('deleted-workspace'),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('does not filter by tenant status', async () => {

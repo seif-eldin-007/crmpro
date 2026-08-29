@@ -26,7 +26,10 @@ describe('NotificationDeliveryService', () => {
         NotificationDeliveryService,
         NotificationTemplateService,
         { provide: InAppNotificationChannel, useValue: inAppChannel },
-        { provide: LoggingService, useValue: { info: jest.fn(), error: jest.fn() } },
+        {
+          provide: LoggingService,
+          useValue: { info: jest.fn(), error: jest.fn() },
+        },
         NotificationMetricsStore,
         { provide: CacheService, useValue: cacheService },
         {

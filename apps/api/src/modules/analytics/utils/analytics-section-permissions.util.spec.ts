@@ -42,12 +42,10 @@ describe('analytics-section-permissions.util', () => {
   });
 
   it('allows activity with audit.read or lead.read', () => {
-    expect(
-      canViewActivitySection(new Set([PERMISSIONS.AUDIT_READ])),
-    ).toBe(true);
-    expect(
-      canViewActivitySection(new Set([PERMISSIONS.LEAD_READ])),
-    ).toBe(true);
+    expect(canViewActivitySection(new Set([PERMISSIONS.AUDIT_READ]))).toBe(
+      true,
+    );
+    expect(canViewActivitySection(new Set([PERMISSIONS.LEAD_READ]))).toBe(true);
     expect(canViewActivitySection(new Set([PERMISSIONS.USER_READ]))).toBe(
       false,
     );

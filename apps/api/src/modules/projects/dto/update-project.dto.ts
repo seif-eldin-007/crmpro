@@ -16,7 +16,7 @@ export class UpdateProjectDto {
   developerId?: string;
 
   @IsOptional()
-  @Transform(({ value }) => normalizeWhitespace(value))
+  @Transform(({ value }: { value: unknown }) => normalizeWhitespace(value))
   @IsString()
   @MinLength(2)
   @MaxLength(150)
@@ -24,7 +24,7 @@ export class UpdateProjectDto {
 
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: unknown }) => {
     if (value === null) {
       return null;
     }

@@ -87,7 +87,8 @@ describe('HttpLoggingInterceptor', () => {
 
     interceptor
       .intercept(context, {
-        handle: () => throwError(() => Object.assign(new Error('boom'), { status: 500 })),
+        handle: () =>
+          throwError(() => Object.assign(new Error('boom'), { status: 500 })),
       } as CallHandler)
       .subscribe({
         error: () => {

@@ -106,11 +106,14 @@ export class CleanupService {
       case CleanupJobName.ORPHAN_S3_OBJECTS:
         return this.cleanupOrphanS3Objects();
       default:
-        throw new Error(`Unsupported cleanup job: ${jobName}`);
+        throw new Error(`Unsupported cleanup job: ${String(jobName)}`);
     }
   }
 
-  async cleanupExpiredUploadIntents(): Promise<{ deleted: number; updated: number }> {
+  async cleanupExpiredUploadIntents(): Promise<{
+    deleted: number;
+    updated: number;
+  }> {
     const batchSize = this.getBatchSize();
     const ttlMinutes = this.getUploadIntentTtlMinutes();
     const now = new Date();
@@ -149,7 +152,10 @@ export class CleanupService {
     return { deleted, updated: 0 };
   }
 
-  async cleanupStaleImportJobs(): Promise<{ deleted: number; updated: number }> {
+  async cleanupStaleImportJobs(): Promise<{
+    deleted: number;
+    updated: number;
+  }> {
     const batchSize = this.getBatchSize();
     const timeoutMinutes = this.getImportJobTimeoutMinutes();
     const cutoff = new Date(Date.now() - timeoutMinutes * 60 * 1000);
@@ -194,9 +200,7 @@ export class CleanupService {
         await this.queueService.requeueImportJob(job.id);
         updated += 1;
 
-        this.logger.warn(
-          `${STALE_IMPORT_JOB_RECLAIMED} jobId=${job.id}`,
-        );
+        this.logger.warn(`${STALE_IMPORT_JOB_RECLAIMED} jobId=${job.id}`);
       }
 
       if (batch.length < batchSize) {
@@ -207,7 +211,10 @@ export class CleanupService {
     return { deleted: 0, updated };
   }
 
-  async cleanupStaleExportJobs(): Promise<{ deleted: number; updated: number }> {
+  async cleanupStaleExportJobs(): Promise<{
+    deleted: number;
+    updated: number;
+  }> {
     const batchSize = this.getBatchSize();
     const timeoutMinutes = this.getExportJobTimeoutMinutes();
     const cutoff = new Date(Date.now() - timeoutMinutes * 60 * 1000);
@@ -251,9 +258,7 @@ export class CleanupService {
         await this.queueService.requeueExportJob(job.id);
         updated += 1;
 
-        this.logger.warn(
-          `${STALE_EXPORT_JOB_RECLAIMED} jobId=${job.id}`,
-        );
+        this.logger.warn(`${STALE_EXPORT_JOB_RECLAIMED} jobId=${job.id}`);
       }
 
       if (batch.length < batchSize) {
@@ -264,7 +269,10 @@ export class CleanupService {
     return { deleted: 0, updated };
   }
 
-  async cleanupExpiredSessions(): Promise<{ deleted: number; updated: number }> {
+  async cleanupExpiredSessions(): Promise<{
+    deleted: number;
+    updated: number;
+  }> {
     const batchSize = this.getBatchSize();
     const retentionDays = this.getSessionRetentionDays();
     const purgeBefore = new Date(
@@ -301,7 +309,10 @@ export class CleanupService {
     return { deleted, updated: 0 };
   }
 
-  async cleanupOrphanS3Objects(): Promise<{ deleted: number; updated: number }> {
+  async cleanupOrphanS3Objects(): Promise<{
+    deleted: number;
+    updated: number;
+  }> {
     const batchSize = this.getBatchSize();
     let deleted = 0;
     let continuationToken: string | undefined;

@@ -10,7 +10,15 @@ import { ImportJobsController } from './import-jobs.controller';
 import { ImportJobsService } from './import-jobs.service';
 
 @Module({
-  imports: [AuthRbacModule, EntitlementsModule, TenantModule, AuditModule, NotificationsModule, LeadsModule, QueueModule],
+  imports: [
+    AuthRbacModule,
+    EntitlementsModule,
+    TenantModule,
+    AuditModule,
+    NotificationsModule,
+    LeadsModule,
+    QueueModule,
+  ],
   controllers: [ImportJobsController],
   providers: [ImportJobsService],
   exports: [ImportJobsService],

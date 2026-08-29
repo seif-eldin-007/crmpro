@@ -53,8 +53,8 @@ describe('ActivityAnalyticsService', () => {
     });
 
     expect(result).toHaveLength(2);
-    expect(result[0]!.id).toBe('act-2');
-    expect(result[1]!.id).toBe('act-1');
+    expect(result[0].id).toBe('act-2');
+    expect(result[1].id).toBe('act-1');
     expect(prisma.auditLog.findMany).not.toHaveBeenCalled();
   });
 });

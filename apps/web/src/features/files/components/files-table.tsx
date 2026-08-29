@@ -111,7 +111,6 @@ export function FilesTable({
   onToggleAll,
   canSelect = false,
   highlightedFileId,
-  onHighlightFile,
 }: FilesTableProps) {
   const highlightRef = useRef<HTMLTableRowElement | null>(null);
   const allSelected =

@@ -112,7 +112,10 @@ export class StorageService {
     }
 
     if (typeof error === 'object' && error !== null) {
-      const err = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+      const err = error as {
+        name?: string;
+        $metadata?: { httpStatusCode?: number };
+      };
       return err.name === 'NotFound' || err.$metadata?.httpStatusCode === 404;
     }
 

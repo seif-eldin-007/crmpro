@@ -261,7 +261,9 @@ export class PlansService {
     }
     if (dto.defaultPrice !== undefined) {
       const current =
-        existing.defaultPrice === null ? null : existing.defaultPrice.toNumber();
+        existing.defaultPrice === null
+          ? null
+          : existing.defaultPrice.toNumber();
       if (dto.defaultPrice !== current) {
         changes.defaultPrice = dto.defaultPrice;
       }

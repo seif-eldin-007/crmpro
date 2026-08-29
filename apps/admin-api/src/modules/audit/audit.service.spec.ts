@@ -94,10 +94,10 @@ describe('AuditService', () => {
           entityType: 'Tenant',
           entityId: 'tenant-1',
           createdAt: expect.objectContaining({
-            gte: expect.any(Date),
-            lte: expect.any(Date),
-          }),
-        }),
+            gte: expect.any(Date) as Date,
+            lte: expect.any(Date) as Date,
+          }) as Record<string, unknown>,
+        }) as Record<string, unknown>,
       }),
     );
   });

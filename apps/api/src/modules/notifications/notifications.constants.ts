@@ -21,7 +21,8 @@ export const NOTIFICATION_TYPE_TO_PREFERENCE: Record<
   NotificationType,
   NotificationPreferenceCategory
 > = {
-  [NotificationType.LEAD_ASSIGNED]: NotificationPreferenceCategory.LEAD_ASSIGNED,
+  [NotificationType.LEAD_ASSIGNED]:
+    NotificationPreferenceCategory.LEAD_ASSIGNED,
   [NotificationType.IMPORT_COMPLETED]:
     NotificationPreferenceCategory.IMPORT_COMPLETED,
   [NotificationType.EXPORT_COMPLETED]:
@@ -37,7 +38,8 @@ export const NOTIFICATION_TYPE_TO_PREFERENCE: Record<
   [NotificationType.TASK_ASSIGNED]: NotificationPreferenceCategory.TASK_UPDATES,
   [NotificationType.TASK_DUE]: NotificationPreferenceCategory.TASK_UPDATES,
   [NotificationType.TASK_OVERDUE]: NotificationPreferenceCategory.TASK_UPDATES,
-  [NotificationType.TASK_COMPLETED]: NotificationPreferenceCategory.TASK_UPDATES,
+  [NotificationType.TASK_COMPLETED]:
+    NotificationPreferenceCategory.TASK_UPDATES,
   [NotificationType.SUPPORT_REPLY]: NotificationPreferenceCategory.SYSTEM,
 };
 

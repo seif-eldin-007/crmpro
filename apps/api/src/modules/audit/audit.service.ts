@@ -67,7 +67,9 @@ export class AuditService {
       rows.map((row) =>
         toAuditLogResponse(
           row,
-          row.entityId ? (labels.get(`${row.entityType}:${row.entityId}`) ?? null) : null,
+          row.entityId
+            ? (labels.get(`${row.entityType}:${row.entityId}`) ?? null)
+            : null,
         ),
       ),
       page,
@@ -76,10 +78,7 @@ export class AuditService {
     );
   }
 
-  async getAuditLog(
-    tenantId: string,
-    id: string,
-  ): Promise<AuditLogResponse> {
+  async getAuditLog(tenantId: string, id: string): Promise<AuditLogResponse> {
     const row = await this.prisma.auditLog.findFirst({
       where: { id, tenantId },
       select: auditLogSelect,

@@ -11,11 +11,7 @@ import {
 } from '../../common/pagination';
 import { QuotaService } from '../../common/quota/quota.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import {
-  buildOrderBy,
-  normalizeSearch,
-  SortOrder,
-} from '../../common/query';
+import { buildOrderBy, normalizeSearch, SortOrder } from '../../common/query';
 import {
   normalizeDisplayName,
   normalizeNameForComparison,
@@ -193,10 +189,7 @@ export class ProjectsService {
     }
   }
 
-  async deleteProject(
-    id: string,
-    tenantId: string,
-  ): Promise<{ id: string }> {
+  async deleteProject(id: string, tenantId: string): Promise<{ id: string }> {
     const project = await this.getProjectOrThrow(id, tenantId);
 
     await this.prisma.project.update({
@@ -317,9 +310,7 @@ export class ProjectsService {
       _count: { _all: true },
     });
 
-    return new Map(
-      counts.map((row) => [row.projectId, row._count._all]),
-    );
+    return new Map(counts.map((row) => [row.projectId, row._count._all]));
   }
 
   private toProjectResponse(

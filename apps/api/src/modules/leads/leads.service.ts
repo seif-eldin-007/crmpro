@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { LeadActivityEventType, LeadStatus, Prisma } from '@crmpro/database';
 import { isEmail } from 'class-validator';
 import {
@@ -18,7 +22,10 @@ import { UpdateLeadDto } from './dto/update-lead.dto';
 import { leadSelect, toLeadResponse } from './lead.mapper';
 import { LeadActivityService } from './services/lead-activity.service';
 import { DomainEventBus } from '../../common/events/domain-event-bus.service';
-import { LeadCreatedEvent, LeadUpdatedEvent } from '../../common/events/domain-event.types';
+import {
+  LeadCreatedEvent,
+  LeadUpdatedEvent,
+} from '../../common/events/domain-event.types';
 import {
   DefaultPipelinePlacement,
   DuplicateWarning,
@@ -225,7 +232,10 @@ export class LeadsService {
     const fullName = normalizeDisplayName(row.fullName);
 
     if (fullName.length < 2) {
-      return { success: false, reason: 'fullName must be at least 2 characters' };
+      return {
+        success: false,
+        reason: 'fullName must be at least 2 characters',
+      };
     }
 
     const primaryPhone = row.primaryPhone.trim();
@@ -234,8 +244,7 @@ export class LeadsService {
       return { success: false, reason: 'Missing primaryPhone' };
     }
 
-    let primaryPhoneNormalized: string;
-    primaryPhoneNormalized = this.normalizePhone(primaryPhone);
+    const primaryPhoneNormalized = this.normalizePhone(primaryPhone);
 
     const secondaryPhone = this.resolveSecondaryPhone(row.secondaryPhone);
     let secondaryPhoneNormalized: string | null = null;
@@ -245,13 +254,16 @@ export class LeadsService {
     }
 
     try {
-      this.ensurePhonesDistinct(primaryPhoneNormalized, secondaryPhoneNormalized);
+      this.ensurePhonesDistinct(
+        primaryPhoneNormalized,
+        secondaryPhoneNormalized,
+      );
     } catch (error) {
       return {
         success: false,
         reason:
           error instanceof BadRequestException
-            ? (error.message as string)
+            ? error.message
             : 'Secondary phone must not match primary phone',
       };
     }
@@ -430,7 +442,9 @@ export class LeadsService {
 
     const lead = await this.getLeadOrThrow(existing.id, tenantId);
 
-    void this.domainEventBus.publish(new LeadUpdatedEvent(tenantId, existing.id));
+    void this.domainEventBus.publish(
+      new LeadUpdatedEvent(tenantId, existing.id),
+    );
 
     return {
       lead: toLeadResponse(lead),
@@ -560,9 +574,7 @@ export class LeadsService {
     return trimmed.length > 0 ? trimmed : null;
   }
 
-  private resolveImportEmail(
-    email?: string | null,
-  ): string | null | 'invalid' {
+  private resolveImportEmail(email?: string | null): string | null {
     if (email === undefined || email === null) {
       return null;
     }
@@ -674,7 +686,9 @@ export class LeadsService {
     const projectIds = projectInterests.map((interest) => interest.projectId);
 
     if (new Set(projectIds).size !== projectIds.length) {
-      throw new BadRequestException('Duplicate project interests are not allowed');
+      throw new BadRequestException(
+        'Duplicate project interests are not allowed',
+      );
     }
 
     const projects = await this.prisma.project.findMany({

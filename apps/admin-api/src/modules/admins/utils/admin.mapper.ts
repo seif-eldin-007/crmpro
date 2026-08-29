@@ -5,7 +5,6 @@ import type {
   AdminNoteItem,
   AdminPermissionSummary,
   AdminRoleDetail,
-  AdminRoleSummary,
 } from '../types/admin.types';
 
 type AdminWithRole = {

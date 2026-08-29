@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { Worker } from 'bullmq';
 import { WorkerLoggingService } from '../../../common/logging/worker-logging.service';

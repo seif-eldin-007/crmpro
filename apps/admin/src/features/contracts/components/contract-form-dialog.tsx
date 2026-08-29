@@ -141,6 +141,8 @@ function ContractForm({
 
   useEffect(() => {
     if (!contract) return;
+    // Hydrating the form from the fetched contract when editing
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setContractName(contract.contractName ?? "");
     setPlanId(contract.plan.id);
     setAgreedPrice(String(contract.agreedPrice));

@@ -15,7 +15,6 @@ import {
 import {
   AgentPerformanceAnalytics,
   AnalyticsDateRange,
-  DashboardOverviewData,
   DashboardOverviewBaseData,
   DeveloperPerformanceAnalytics,
   LeadSourceAnalytics,
@@ -217,8 +216,9 @@ export class AnalyticsQueryService {
           const count = countMap.get(`${pipeline.id}:${stage.id}`) ?? 0;
           const previousCount =
             index > 0
-              ? (countMap.get(`${pipeline.id}:${pipeline.stages[index - 1]!.id}`) ??
-                0)
+              ? (countMap.get(
+                  `${pipeline.id}:${pipeline.stages[index - 1].id}`,
+                ) ?? 0)
               : null;
 
           return {
@@ -272,7 +272,9 @@ export class AnalyticsQueryService {
         })
       : [];
 
-    const sourceNameById = new Map(sources.map((source) => [source.id, source.name]));
+    const sourceNameById = new Map(
+      sources.map((source) => [source.id, source.name]),
+    );
     const total = grouped.reduce((sum, row) => sum + row._count._all, 0);
 
     const results = grouped.map((row) => {
@@ -416,7 +418,9 @@ export class AnalyticsQueryService {
       },
     });
 
-    const projectById = new Map(projects.map((project) => [project.id, project]));
+    const projectById = new Map(
+      projects.map((project) => [project.id, project]),
+    );
 
     return grouped
       .map((row) => {
@@ -596,9 +600,7 @@ export class AnalyticsQueryService {
       ...(createdAt && { createdAt }),
     };
 
-    const jobDateFilter = createdAt
-      ? { completedAt: createdAt }
-      : undefined;
+    const jobDateFilter = createdAt ? { completedAt: createdAt } : undefined;
 
     const [activities, importJobs, exportJobs] = await Promise.all([
       this.prisma.leadActivity.findMany({
@@ -649,10 +651,14 @@ export class AnalyticsQueryService {
       ...activities.map((activity) => ({
         id: activity.id,
         type: this.mapActivityType(activity.eventType),
-        title: this.buildActivityTitle(activity.eventType, activity.lead.fullName),
+        title: this.buildActivityTitle(
+          activity.eventType,
+          activity.lead.fullName,
+        ),
         occurredAt: activity.createdAt.toISOString(),
         metadata: {
-          ...(typeof activity.metadata === 'object' && activity.metadata !== null
+          ...(typeof activity.metadata === 'object' &&
+          activity.metadata !== null
             ? (activity.metadata as Record<string, unknown>)
             : {}),
         },
@@ -707,7 +713,8 @@ export class AnalyticsQueryService {
 
     const to = range.to ?? new Date();
     const from =
-      range.from ?? subtractUtcMonths(startOfUtcMonth(to), DEFAULT_TREND_MONTHS - 1);
+      range.from ??
+      subtractUtcMonths(startOfUtcMonth(to), DEFAULT_TREND_MONTHS - 1);
 
     return { from, to };
   }

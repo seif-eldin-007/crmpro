@@ -1,5 +1,4 @@
 import { apiClient } from "@/lib/api/client";
-import { setStoredRefreshToken } from "@/lib/api/refresh-token";
 import type { AdminAuthorization, AuthUser } from "@/types/auth";
 
 export interface LoginPayload {
@@ -10,30 +9,20 @@ export interface LoginPayload {
 
 export interface LoginResult {
   accessToken: string;
-  refreshToken: string;
   admin: AuthUser;
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResult> {
-  const result = await apiClient.authPost<LoginResult>("/auth/login", payload);
-  setStoredRefreshToken(result.refreshToken);
-  return result;
+  // The refresh token is stored in an httpOnly cookie by the API; the client
+  // only receives the short-lived access token.
+  return apiClient.post<LoginResult>("/auth/login", payload);
 }
 
-export async function refreshSession() {
-  const { getStoredRefreshToken } = await import("@/lib/api/refresh-token");
-  const refreshToken = getStoredRefreshToken();
-  if (!refreshToken) {
-    throw new Error("No refresh token");
-  }
-
-  const result = await apiClient.authPost<{
-    accessToken: string;
-    refreshToken: string;
-  }>("/auth/refresh", { refreshToken });
-
-  setStoredRefreshToken(result.refreshToken);
-  return result;
+export async function refreshSession(): Promise<{ accessToken: string }> {
+  return apiClient.post<{ accessToken: string }>("/auth/refresh", undefined, {
+    skipAuth: true,
+    skipRefresh: true,
+  });
 }
 
 export function logout() {

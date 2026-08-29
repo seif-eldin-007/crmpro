@@ -1,14 +1,13 @@
 import { authApi } from "@/features/auth/api";
 import { useAuthStore } from "@/stores/auth-store";
-import { getStoredRefreshToken } from "@/lib/api/refresh-token";
 
+/**
+ * Bootstraps the session from the httpOnly refresh cookie. The cookie is not
+ * readable from JS, so we simply attempt a silent refresh — a 401 means there
+ * is no (valid) session.
+ */
 export async function hydrateAuthSession(): Promise<boolean> {
   const store = useAuthStore.getState();
-
-  if (!getStoredRefreshToken()) {
-    store.clearAuth();
-    return false;
-  }
 
   const { accessToken } = await authApi.refresh();
   store.setAccessToken(accessToken);

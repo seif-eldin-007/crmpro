@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppIcons } from "@/components/icons/app-icons";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +53,7 @@ export function SupportPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const { data, isLoading, isError, refetch, isFetching } =
     useSupportConversations({ limit: 50 });
-  const conversations = data?.items ?? [];
+  const conversations = useMemo(() => data?.items ?? [], [data?.items]);
 
   useEffect(() => {
     if (!selectedId && conversations.length > 0) {
@@ -211,9 +211,11 @@ function ThreadPane({
 
   useEffect(() => {
     const saved = localStorage.getItem(draftKey);
+    // Loading the persisted draft for the newly selected conversation (external storage sync)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setDraft(saved);
     else setDraft("");
-  }, [conversationId]);
+  }, [conversationId, draftKey]);
 
   useEffect(() => {
     if (draft.trim()) {

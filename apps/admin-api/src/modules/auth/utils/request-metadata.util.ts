@@ -26,8 +26,7 @@ export function extractRequestSecurityMetadata(
   deviceNameFromBody?: string,
 ): RequestSecurityMetadata {
   return {
-    deviceName:
-      deviceNameFromBody ?? getHeader(req, 'x-device-name') ?? null,
+    deviceName: deviceNameFromBody ?? getHeader(req, 'x-device-name') ?? null,
     ipAddress: getClientIp(req) ?? null,
     userAgent: getHeader(req, 'user-agent') ?? null,
     fingerprint: getHeader(req, 'x-device-fingerprint') ?? null,

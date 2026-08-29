@@ -108,7 +108,10 @@ export class RolesService {
     const name = normalizeDisplayName(dto.name);
     this.assertNotReservedRoleName(name);
 
-    if (normalizeNameForComparison(name) !== normalizeNameForComparison(existing.name)) {
+    if (
+      normalizeNameForComparison(name) !==
+      normalizeNameForComparison(existing.name)
+    ) {
       await this.assertRoleNameUnique(tenantId, name, id);
     }
 
@@ -281,16 +284,16 @@ export class RolesService {
     return { permissionCount, userCount };
   }
 
-  private async getRolePermissionKeys(roleId: string): Promise<PermissionKey[]> {
+  private async getRolePermissionKeys(
+    roleId: string,
+  ): Promise<PermissionKey[]> {
     const permissions = await this.prisma.rolePermission.findMany({
       where: { roleId },
       select: { permission: { select: { key: true } } },
       orderBy: { permission: { key: 'asc' } },
     });
 
-    return permissions.map(
-      (entry) => entry.permission.key,
-    ) as PermissionKey[];
+    return permissions.map((entry) => entry.permission.key) as PermissionKey[];
   }
 
   private async resolvePermissionKeys(

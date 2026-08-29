@@ -14,7 +14,6 @@ import { ADMIN_PERMISSIONS } from '@crmpro/shared';
 import type { Request } from 'express';
 import {
   AdminPermissionsGuard,
-  RequireAdminPermission,
   RequireAnyAdminPermission,
 } from '../../common/auth';
 import { toListResponseData } from '../../common/http/list-response';

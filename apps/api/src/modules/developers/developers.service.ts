@@ -256,9 +256,7 @@ export class DevelopersService {
       _count: { _all: true },
     });
 
-    return new Map(
-      counts.map((row) => [row.developerId, row._count._all]),
-    );
+    return new Map(counts.map((row) => [row.developerId, row._count._all]));
   }
 
   private async loadInterestedLeadCounts(
@@ -303,10 +301,7 @@ export class DevelopersService {
       if (!developerId) {
         continue;
       }
-      counts.set(
-        developerId,
-        (counts.get(developerId) ?? 0) + row._count._all,
-      );
+      counts.set(developerId, (counts.get(developerId) ?? 0) + row._count._all);
     }
 
     return counts;

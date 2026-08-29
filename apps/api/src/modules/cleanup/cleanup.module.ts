@@ -8,15 +8,7 @@ import { CleanupService } from './cleanup.service';
 
 @Module({
   imports: [PrismaModule, StorageModule, QueueModule],
-  providers: [
-    CleanupService,
-    CleanupHealthService,
-    CleanupSchedulerService,
-  ],
-  exports: [
-    CleanupService,
-    CleanupHealthService,
-    CleanupSchedulerService,
-  ],
+  providers: [CleanupService, CleanupHealthService, CleanupSchedulerService],
+  exports: [CleanupService, CleanupHealthService, CleanupSchedulerService],
 })
 export class CleanupModule {}

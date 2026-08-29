@@ -44,7 +44,11 @@ describe('NotificationProcessor', () => {
       metadata: {},
     };
 
-    await (processor as unknown as { handleJob: (job: { data: typeof payload }) => Promise<void> }).handleJob({
+    await (
+      processor as unknown as {
+        handleJob: (job: { data: typeof payload }) => Promise<void>;
+      }
+    ).handleJob({
       data: payload,
     });
 

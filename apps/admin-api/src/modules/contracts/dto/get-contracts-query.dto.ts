@@ -1,4 +1,4 @@
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 import {
   ContractStatus,
   PaymentFrequency,
@@ -27,7 +27,7 @@ export class GetContractsQueryDto extends ListQueryDto {
   @IsString()
   @MaxLength(3)
   @Matches(/^[A-Za-z]{3}$/, { message: 'Currency must be a 3-letter code' })
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toUpperCase() : value,
   )
   currency?: string;

@@ -21,7 +21,9 @@ export function useRealtimeStream() {
 
   // Use refs to avoid recreating the socket when QC changes
   const queryClientRef = useRef(queryClient);
-  queryClientRef.current = queryClient;
+  useEffect(() => {
+    queryClientRef.current = queryClient;
+  }, [queryClient]);
 
   const socketRef = useRef<Socket | null>(null);
 

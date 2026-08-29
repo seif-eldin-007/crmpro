@@ -39,15 +39,23 @@ describe('UsersService audit integration', () => {
           role: { id: 'role-1', name: 'Agent' },
         }),
       },
-      $transaction: jest.fn(async (callback) => callback(prisma)),
+      $transaction: jest.fn((callback: (client: typeof prisma) => unknown) =>
+        callback(prisma),
+      ),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
         { provide: PrismaService, useValue: prisma },
-        { provide: PasswordService, useValue: { hash: jest.fn().mockResolvedValue('hash') } },
-        { provide: QuotaService, useValue: { assertCanCreateUserInTransaction: jest.fn() } },
+        {
+          provide: PasswordService,
+          useValue: { hash: jest.fn().mockResolvedValue('hash') },
+        },
+        {
+          provide: QuotaService,
+          useValue: { assertCanCreateUserInTransaction: jest.fn() },
+        },
         { provide: PermissionsService, useValue: {} },
         {
           provide: UserGuardService,

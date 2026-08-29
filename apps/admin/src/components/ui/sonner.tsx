@@ -10,6 +10,8 @@ function useDocumentTheme(): ToasterProps["theme"] {
     const resolveTheme = () =>
       document.documentElement.classList.contains("dark") ? "dark" : "light";
 
+    // Initial read of external DOM theme; further updates arrive via MutationObserver callback
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(resolveTheme());
 
     const observer = new MutationObserver(() => {

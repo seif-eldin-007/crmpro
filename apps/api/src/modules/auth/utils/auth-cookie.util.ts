@@ -12,7 +12,10 @@ export interface RefreshCookieRuntimeConfig {
 function resolveCookieOptions(
   config: RefreshCookieRuntimeConfig,
 ): ReturnType<typeof buildRefreshCookieOptions> {
-  return buildRefreshCookieOptions(config.nodeEnv, config.refreshTokenExpiration);
+  return buildRefreshCookieOptions(
+    config.nodeEnv,
+    config.refreshTokenExpiration,
+  );
 }
 
 export function setRefreshCookie(

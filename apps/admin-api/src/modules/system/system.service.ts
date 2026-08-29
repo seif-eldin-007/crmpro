@@ -6,7 +6,6 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import type {
   HealthStatus,
   JobStatusCounts,
-  QueueHealthStatus,
   QueueMetricsSnapshot,
   SystemHealthData,
   SystemHttpMetrics,
@@ -14,7 +13,6 @@ import type {
   SystemQueueSnapshot,
   TenantApiHealth,
   WorkerHealthMap,
-  WorkerStatus,
 } from './system.types';
 
 const EMPTY_JOB_COUNTS: JobStatusCounts = {
@@ -92,13 +90,7 @@ export class SystemService {
   ) {}
 
   async getHealth(): Promise<SystemHealthData> {
-    const [
-      database,
-      redis,
-      tenantProbe,
-      snapshot,
-      jobs,
-    ] = await Promise.all([
+    const [database, redis, tenantProbe, snapshot, jobs] = await Promise.all([
       this.checkDatabase(),
       this.checkRedis(),
       this.probeTenantApi(),
@@ -106,8 +98,7 @@ export class SystemService {
       this.getJobsSnapshot(),
     ]);
 
-    const version =
-      this.configService.get<string>('app.version') ?? '1.0.0';
+    const version = this.configService.get<string>('app.version') ?? '1.0.0';
     const environment =
       this.configService.get<string>('app.nodeEnv') ?? 'development';
     const uptimeSeconds = Math.floor(process.uptime());
@@ -337,19 +328,17 @@ export class SystemService {
 
     const source = snapshot.metrics.workers ?? snapshot.jobs.workers;
     return {
-      import: source.import as WorkerStatus,
-      export: source.export as WorkerStatus,
-      cleanup: source.cleanup as WorkerStatus,
-      notification: source.notification as WorkerStatus,
+      import: source.import,
+      export: source.export,
+      cleanup: source.cleanup,
+      notification: source.notification,
     };
   }
 
   private async getJobsSnapshot() {
     const stuckTimeoutMinutes =
       this.configService.get<number>('jobs.stuckTimeoutMinutes') ?? 15;
-    const cutoff = new Date(
-      Date.now() - stuckTimeoutMinutes * 60 * 1000,
-    );
+    const cutoff = new Date(Date.now() - stuckTimeoutMinutes * 60 * 1000);
 
     const [importGroups, exportGroups, stuckImports, stuckExports] =
       await Promise.all([

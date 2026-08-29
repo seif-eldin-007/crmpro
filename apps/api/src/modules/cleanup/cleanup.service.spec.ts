@@ -37,9 +37,6 @@ describe('CleanupService', () => {
     fileAsset: {
       findMany: jest.Mock;
     };
-    fileUploadIntent: {
-      findMany: jest.Mock;
-    };
   };
   let storageService: {
     listObjectKeys: jest.Mock;
@@ -79,10 +76,6 @@ describe('CleanupService', () => {
       },
       fileAsset: {
         findMany: jest.fn(),
-      },
-      fileUploadIntent: {
-        findMany: jest.fn(),
-        deleteMany: jest.fn(),
       },
     };
 
@@ -148,7 +141,7 @@ describe('CleanupService', () => {
         where: expect.objectContaining({
           id: 'import-1',
           status: JobStatus.PROCESSING,
-        }),
+        }) as Record<string, unknown>,
         data: expect.objectContaining({
           status: JobStatus.PENDING,
           processedRows: 0,
@@ -156,7 +149,7 @@ describe('CleanupService', () => {
           failedRows: 0,
           totalRows: 0,
           completedAt: null,
-        }),
+        }) as Record<string, unknown>,
       }),
     );
     expect(queueService.requeueImportJob).toHaveBeenCalledWith('import-1');
@@ -174,13 +167,13 @@ describe('CleanupService', () => {
         where: expect.objectContaining({
           id: 'export-1',
           status: JobStatus.PROCESSING,
-        }),
+        }) as Record<string, unknown>,
         data: expect.objectContaining({
           status: JobStatus.PENDING,
           progress: 0,
           errorMessage: null,
           completedAt: null,
-        }),
+        }) as Record<string, unknown>,
       }),
     );
     expect(queueService.requeueExportJob).toHaveBeenCalledWith('export-1');
@@ -195,7 +188,7 @@ describe('CleanupService', () => {
     expect(result.deleted).toBe(1);
     expect(prisma.userSession.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { expiresAt: { lt: expect.any(Date) } },
+        where: { expiresAt: { lt: expect.any(Date) as Date } },
       }),
     );
   });
@@ -215,8 +208,12 @@ describe('CleanupService', () => {
     const result = await service.cleanupOrphanS3Objects();
 
     expect(result.deleted).toBe(1);
-    expect(storageService.deleteFile).toHaveBeenCalledWith('tenant/a/orphan.csv');
-    expect(storageService.deleteFile).not.toHaveBeenCalledWith('tenant/a/file.csv');
+    expect(storageService.deleteFile).toHaveBeenCalledWith(
+      'tenant/a/orphan.csv',
+    );
+    expect(storageService.deleteFile).not.toHaveBeenCalledWith(
+      'tenant/a/file.csv',
+    );
   });
 
   it('is idempotent when stale import jobs are already reclaimed', async () => {

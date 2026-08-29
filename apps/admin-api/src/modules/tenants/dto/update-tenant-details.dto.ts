@@ -6,6 +6,8 @@ export class UpdateTenantDetailsDto {
   @IsString()
   @MinLength(2)
   @MaxLength(150)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   name?: string;
 }

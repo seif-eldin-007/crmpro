@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ForbiddenException,
-  HttpException,
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@crmpro/database';
@@ -73,7 +72,9 @@ describe('Global error contract mapper', () => {
   });
 
   it('maps unknown errors to INTERNAL_SERVER_ERROR without leaking details', () => {
-    const result = mapExceptionToApiErrorResponse(new Error('database exploded'));
+    const result = mapExceptionToApiErrorResponse(
+      new Error('database exploded'),
+    );
 
     expect(result.status).toBe(500);
     expect(result.body).toEqual({

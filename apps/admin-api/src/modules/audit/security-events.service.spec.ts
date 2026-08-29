@@ -1,9 +1,6 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  AdminSecurityEventType,
-  SecuritySeverity,
-} from '@crmpro/database';
+import { AdminSecurityEventType, SecuritySeverity } from '@crmpro/database';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { SecurityEventsService } from './security-events.service';
 
@@ -75,10 +72,10 @@ describe('SecurityEventsService', () => {
           eventType: AdminSecurityEventType.TOKEN_REUSE,
           severity: SecuritySeverity.CRITICAL,
           createdAt: expect.objectContaining({
-            gte: expect.any(Date),
-            lte: expect.any(Date),
-          }),
-        }),
+            gte: expect.any(Date) as Date,
+            lte: expect.any(Date) as Date,
+          }) as Record<string, unknown>,
+        }) as Record<string, unknown>,
       }),
     );
     expect(result.items[0]?.id).toBe('event-1');

@@ -116,7 +116,9 @@ describe('QueueService', () => {
         requestId: 'req-123',
       },
       expect.objectContaining({
-        jobId: expect.stringMatching(/^cleanup-FILE_UPLOAD_INTENTS-\d+$/),
+        jobId: expect.stringMatching(
+          /^cleanup-FILE_UPLOAD_INTENTS-\d+$/,
+        ) as string,
       }),
     );
   });

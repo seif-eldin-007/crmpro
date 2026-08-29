@@ -26,17 +26,19 @@ export class TenantUsageService {
       throw new NotFoundException('Tenant not found');
     }
 
-    const [usersUsed, leadsUsed, projectsUsed] = await this.prisma.$transaction([
-      this.prisma.user.count({
-        where: { tenantId, deletedAt: null, isActive: true },
-      }),
-      this.prisma.lead.count({
-        where: { tenantId, deletedAt: null },
-      }),
-      this.prisma.project.count({
-        where: { tenantId, deletedAt: null },
-      }),
-    ]);
+    const [usersUsed, leadsUsed, projectsUsed] = await this.prisma.$transaction(
+      [
+        this.prisma.user.count({
+          where: { tenantId, deletedAt: null, isActive: true },
+        }),
+        this.prisma.lead.count({
+          where: { tenantId, deletedAt: null },
+        }),
+        this.prisma.project.count({
+          where: { tenantId, deletedAt: null },
+        }),
+      ],
+    );
 
     const plan = tenant.subscriptionPlan;
 
@@ -56,9 +58,7 @@ export class TenantUsageService {
       storage: {
         usedBytes: Number(tenant.storageUsedBytes),
         limitBytes:
-          plan.maxStorageBytes === null
-            ? null
-            : Number(plan.maxStorageBytes),
+          plan.maxStorageBytes === null ? null : Number(plan.maxStorageBytes),
       },
     };
   }

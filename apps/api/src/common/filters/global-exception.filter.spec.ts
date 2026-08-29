@@ -62,7 +62,7 @@ describe('GlobalExceptionFilter (CRM API)', () => {
         metadata: expect.objectContaining({
           method: 'GET',
           path: '/api/v1/auth/me',
-        }),
+        }) as Record<string, unknown>,
       }),
     );
   });

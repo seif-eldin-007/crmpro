@@ -99,7 +99,10 @@ describe('ContractEntitlementSyncService', () => {
     };
 
     await expect(
-      service.assertTenantContractPlanConsistency('tenant-1', txClient as never),
+      service.assertTenantContractPlanConsistency(
+        'tenant-1',
+        txClient as never,
+      ),
     ).resolves.toBeUndefined();
 
     expect(txClient.tenantContract.findFirst).toHaveBeenCalledWith(
@@ -107,7 +110,7 @@ describe('ContractEntitlementSyncService', () => {
         where: expect.objectContaining({
           tenantId: 'tenant-1',
           status: ContractStatus.ACTIVE,
-        }),
+        }) as Record<string, unknown>,
       }),
     );
   });

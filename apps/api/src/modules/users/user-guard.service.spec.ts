@@ -43,7 +43,10 @@ describe('UserGuardService last owner protection', () => {
         { provide: PrismaService, useValue: prisma },
         {
           provide: PermissionsService,
-          useValue: { getPermissionKeysForUser: jest.fn(), getPermissionKeysForRole: jest.fn() },
+          useValue: {
+            getPermissionKeysForUser: jest.fn(),
+            getPermissionKeysForRole: jest.fn(),
+          },
         },
       ],
     }).compile();

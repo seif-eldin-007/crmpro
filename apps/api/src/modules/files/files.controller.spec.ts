@@ -22,16 +22,14 @@ describe('FilesController RBAC', () => {
     tenantId: 'tenant-1',
   } as AuthenticatedUser;
 
-  const buildContext = (
-    handler: (...args: unknown[]) => unknown,
-  ) =>
+  const buildContext = (handler: (...args: unknown[]) => unknown) =>
     ({
       getHandler: () => handler,
       getClass: () => FilesController,
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
-    }) as Parameters<PermissionsGuard['canActivate']>[0];
+    }) as unknown as Parameters<PermissionsGuard['canActivate']>[0];
 
   beforeEach(async () => {
     permissionsService = {
@@ -55,8 +53,10 @@ describe('FilesController RBAC', () => {
       new Set([PERMISSIONS.FILE_DELETE]),
     );
 
-    const handler = FilesController.prototype.deleteFile;
-    const required = reflector.get<typeof PERMISSIONS.FILE_DELETE[]>(
+    const handler = Reflect.get(FilesController.prototype, 'deleteFile') as (
+      ...args: unknown[]
+    ) => unknown;
+    const required = reflector.get<(typeof PERMISSIONS.FILE_DELETE)[]>(
       PERMISSIONS_METADATA_KEY,
       handler,
     );
@@ -71,16 +71,23 @@ describe('FilesController RBAC', () => {
       new Set([PERMISSIONS.FILE_UPLOAD, PERMISSIONS.FILE_READ]),
     );
 
-    const handler = FilesController.prototype.deleteFile;
+    const handler = Reflect.get(FilesController.prototype, 'deleteFile') as (
+      ...args: unknown[]
+    ) => unknown;
 
     await expect(guard.canActivate(buildContext(handler))).rejects.toThrow(
       ForbiddenException,
     );
   });
 
-  it('requires file.upload for request-upload', async () => {
-    const handler = FilesController.prototype.requestUpload;
-    const required = reflector.get(PERMISSIONS_METADATA_KEY, handler);
+  it('requires file.upload for request-upload', () => {
+    const handler = Reflect.get(FilesController.prototype, 'requestUpload') as (
+      ...args: unknown[]
+    ) => unknown;
+    const required = reflector.get<(typeof PERMISSIONS.FILE_UPLOAD)[]>(
+      PERMISSIONS_METADATA_KEY,
+      handler,
+    );
 
     expect(required).toEqual([PERMISSIONS.FILE_UPLOAD]);
   });

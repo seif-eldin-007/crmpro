@@ -32,10 +32,7 @@ describe('QuotaService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        QuotaService,
-        { provide: PrismaService, useValue: prisma },
-      ],
+      providers: [QuotaService, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     service = module.get(QuotaService);
@@ -45,7 +42,9 @@ describe('QuotaService', () => {
     it('allows creation when below Starter lead limit', async () => {
       prisma.lead.count.mockResolvedValue(1);
 
-      await expect(service.assertCanCreateLead('tenant-1')).resolves.toBeUndefined();
+      await expect(
+        service.assertCanCreateLead('tenant-1'),
+      ).resolves.toBeUndefined();
     });
 
     it('rejects creation when at Starter lead limit', async () => {
@@ -62,7 +61,9 @@ describe('QuotaService', () => {
       });
       prisma.lead.count.mockResolvedValue(1_000_000);
 
-      await expect(service.assertCanCreateLead('tenant-1')).resolves.toBeUndefined();
+      await expect(
+        service.assertCanCreateLead('tenant-1'),
+      ).resolves.toBeUndefined();
     });
   });
 
@@ -175,8 +176,8 @@ describe('QuotaService', () => {
         expect.objectContaining({
           where: expect.objectContaining({
             tenantId: 'tenant-1',
-            expiresAt: { gt: expect.any(Date) },
-          }),
+            expiresAt: { gt: expect.any(Date) as Date },
+          }) as Record<string, unknown>,
         }),
       );
     });
@@ -203,7 +204,7 @@ describe('QuotaService', () => {
         expect.objectContaining({
           where: expect.objectContaining({
             id: { not: 'intent-1' },
-          }),
+          }) as Record<string, unknown>,
         }),
       );
     });

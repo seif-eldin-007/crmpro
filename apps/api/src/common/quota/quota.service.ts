@@ -172,7 +172,10 @@ export class QuotaService {
     sizeBytes: number,
     options?: { excludeUploadIntentId?: string },
   ): Promise<void> {
-    const context = await this.loadTenantQuotaContextInTransaction(tx, tenantId);
+    const context = await this.loadTenantQuotaContextInTransaction(
+      tx,
+      tenantId,
+    );
 
     if (context.maxStorageBytes === null) {
       return;

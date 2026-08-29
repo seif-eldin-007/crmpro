@@ -1,7 +1,10 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
-import { PLAN_FEATURES, FEATURE_UNAVAILABLE_MESSAGE } from './entitlement.constants';
+import {
+  PLAN_FEATURES,
+  FEATURE_UNAVAILABLE_MESSAGE,
+} from './entitlement.constants';
 import { PlanEntitlementService } from './plan-entitlement.service';
 
 describe('PlanEntitlementService', () => {
@@ -37,9 +40,7 @@ describe('PlanEntitlementService', () => {
 
     await expect(
       service.assertFeatureEnabled('tenant-1', PLAN_FEATURES.ANALYTICS),
-    ).rejects.toThrow(
-      new ForbiddenException(FEATURE_UNAVAILABLE_MESSAGE),
-    );
+    ).rejects.toThrow(new ForbiddenException(FEATURE_UNAVAILABLE_MESSAGE));
   });
 
   it('allows analytics for Growth plan', async () => {

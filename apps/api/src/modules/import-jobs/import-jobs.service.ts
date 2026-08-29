@@ -197,10 +197,7 @@ export class ImportJobsService {
     });
   }
 
-  async getImportJob(
-    id: string,
-    tenantId: string,
-  ): Promise<ImportJobResponse> {
+  async getImportJob(id: string, tenantId: string): Promise<ImportJobResponse> {
     const job = await this.getImportJobOrThrow(id, tenantId);
     return this.toImportJobResponse(job);
   }
@@ -289,10 +286,7 @@ export class ImportJobsService {
 
         const isLastRow = processedRows === totalRows;
 
-        if (
-          processedRows % PROGRESS_UPDATE_BATCH_SIZE === 0 ||
-          isLastRow
-        ) {
+        if (processedRows % PROGRESS_UPDATE_BATCH_SIZE === 0 || isLastRow) {
           await this.persistProgress(jobId, {
             processedRows,
             successfulRows,
@@ -311,7 +305,7 @@ export class ImportJobsService {
     } catch (error: unknown) {
       const reason =
         error instanceof BadRequestException
-          ? (error.message as string)
+          ? error.message
           : error instanceof Error
             ? error.message
             : 'Import failed';
@@ -438,8 +432,7 @@ export class ImportJobsService {
         failedRows: params.failedRows,
         ...(params.errors.length > 0
           ? {
-              errorSummary:
-                params.errors as unknown as Prisma.InputJsonValue,
+              errorSummary: params.errors as unknown as Prisma.InputJsonValue,
             }
           : {}),
       },
@@ -448,7 +441,7 @@ export class ImportJobsService {
 
   private isBlankRow(row: LeadCsvRow): boolean {
     return Object.values(row).every(
-      (value) => value === undefined || value.trim().length === 0,
+      (value) => typeof value !== 'string' || value.trim().length === 0,
     );
   }
 
@@ -608,9 +601,7 @@ export class ImportJobsService {
       },
     });
 
-    void this.domainEventBus.publish(
-      new ImportCompletedEvent(tenantId, jobId),
-    );
+    void this.domainEventBus.publish(new ImportCompletedEvent(tenantId, jobId));
 
     if (
       status === JobStatus.COMPLETED ||

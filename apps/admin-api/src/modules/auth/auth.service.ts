@@ -39,7 +39,11 @@ export class AuthService {
     });
 
     if (!admin) {
-      await this.adminSecurityService.logLoginFailed(null, metadata, 'not_found');
+      await this.adminSecurityService.logLoginFailed(
+        null,
+        metadata,
+        'not_found',
+      );
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -246,7 +250,9 @@ export class AuthService {
     });
   }
 
-  async listSessions(authAdmin: AuthenticatedAdmin): Promise<SessionListItem[]> {
+  async listSessions(
+    authAdmin: AuthenticatedAdmin,
+  ): Promise<SessionListItem[]> {
     return this.adminSessionService.listActiveSessions(
       authAdmin.id,
       authAdmin.sessionId,

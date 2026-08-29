@@ -26,8 +26,7 @@ export function extractLoginSessionMetadata(
   deviceNameFromBody?: string,
 ): LoginSessionMetadata {
   return {
-    deviceName:
-      deviceNameFromBody ?? getHeader(req, 'x-device-name') ?? null,
+    deviceName: deviceNameFromBody ?? getHeader(req, 'x-device-name') ?? null,
     ipAddress: getClientIp(req) ?? null,
     userAgent: getHeader(req, 'user-agent') ?? null,
   };

@@ -53,6 +53,8 @@ export function CommandPalette() {
 
   useEffect(() => {
     if (!open) {
+      // Clearing the query when the palette (external store) closes
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery("");
     }
   }, [open]);

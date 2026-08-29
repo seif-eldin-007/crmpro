@@ -1,8 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { AuthenticatedUser } from '../../../modules/auth/types/jwt-payload.type';
 import { PLAN_FEATURE_METADATA_KEY } from '../entitlement.constants';
@@ -17,10 +13,9 @@ export class PlanEntitlementGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const feature = this.reflector.getAllAndOverride<PlanFeatureKey | undefined>(
-      PLAN_FEATURE_METADATA_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const feature = this.reflector.getAllAndOverride<
+      PlanFeatureKey | undefined
+    >(PLAN_FEATURE_METADATA_KEY, [context.getHandler(), context.getClass()]);
 
     if (!feature) {
       return true;

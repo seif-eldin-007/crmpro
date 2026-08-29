@@ -110,8 +110,8 @@ describe('AnalyticsController', () => {
     });
 
     expect(analyticsService.getOverview).toHaveBeenCalledWith('tenant-1', {
-      from: expect.any(Date),
-      to: expect.any(Date),
+      from: expect.any(Date) as Date,
+      to: expect.any(Date) as Date,
     });
   });
 
@@ -141,7 +141,10 @@ describe('AnalyticsController', () => {
       }),
     ).resolves.toEqual({
       success: true,
-      data: expect.objectContaining({ page: 1, limit: 20 }),
+      data: expect.objectContaining({
+        page: 1,
+        limit: 20,
+      }) as Record<string, unknown>,
     });
 
     expect(analyticsService.getRecentActivity).toHaveBeenCalledWith(
@@ -158,8 +161,8 @@ describe('AnalyticsController', () => {
     expect(analyticsService.getTrendAnalytics).toHaveBeenCalledWith(
       'tenant-1',
       expect.objectContaining({
-        from: expect.any(Date),
-        to: expect.any(Date),
+        from: expect.any(Date) as Date,
+        to: expect.any(Date) as Date,
       }),
     );
   });
@@ -221,11 +224,16 @@ describe('AnalyticsController plan entitlements', () => {
 
   it('blocks overview when analytics feature is disabled', async () => {
     planEntitlementService.assertFeatureEnabled.mockRejectedValue(
-      new ForbiddenException('Feature unavailable in current subscription plan.'),
+      new ForbiddenException(
+        'Feature unavailable in current subscription plan.',
+      ),
     );
 
     const context = {
-      getHandler: () => AnalyticsController.prototype.getOverview,
+      getHandler: () =>
+        Reflect.get(AnalyticsController.prototype, 'getOverview') as (
+          ...args: unknown[]
+        ) => unknown,
       getClass: () => AnalyticsController,
       switchToHttp: () => ({
         getRequest: () => ({
@@ -234,6 +242,8 @@ describe('AnalyticsController plan entitlements', () => {
       }),
     } as never;
 
-    await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      ForbiddenException,
+    );
   });
 });

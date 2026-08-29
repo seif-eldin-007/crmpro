@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationPriority, NotificationType } from '@crmpro/database';
+import { DomainEventBus } from '../../../common/events/domain-event-bus.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { InAppNotificationChannel } from './in-app-notification.channel';
 
@@ -24,17 +25,19 @@ describe('InAppNotificationChannel', () => {
         createMany: jest.fn(),
         findFirst: jest.fn(),
       },
-      auditLog: { create: jest.fn().mockResolvedValue(undefined),
-      },
+      auditLog: { create: jest.fn().mockResolvedValue(undefined) },
     };
     prisma = {
-      $transaction: jest.fn(async (callback) => callback(tx)),
+      $transaction: jest.fn((callback: (client: typeof tx) => unknown) =>
+        callback(tx),
+      ),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         InAppNotificationChannel,
         { provide: PrismaService, useValue: prisma },
+        { provide: DomainEventBus, useValue: { publish: jest.fn() } },
       ],
     }).compile();
 
@@ -68,7 +71,9 @@ describe('InAppNotificationChannel', () => {
     });
     expect(tx.auditLog.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ entityId: 'notification-1' }),
+        data: expect.objectContaining({
+          entityId: 'notification-1',
+        }) as Record<string, unknown>,
       }),
     );
   });

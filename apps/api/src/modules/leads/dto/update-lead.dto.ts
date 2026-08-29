@@ -26,21 +26,23 @@ export class UpdateLeadDto {
   status?: LeadStatus;
 
   @IsOptional()
-  @Transform(({ value }) => normalizeWhitespace(value))
+  @Transform(({ value }: { value: unknown }) => normalizeWhitespace(value))
   @IsString()
   @MinLength(2)
   @MaxLength(150)
   fullName?: string;
 
   @IsOptional()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   @IsString()
   @MinLength(1)
   primaryPhone?: string;
 
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: unknown }) => {
     if (value === null) {
       return null;
     }
@@ -52,7 +54,7 @@ export class UpdateLeadDto {
 
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: unknown }) => {
     if (value === null) {
       return null;
     }

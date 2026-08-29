@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { toListResponseData } from '../../common/http/list-response';
 import { PermissionsService } from '../../common/auth/services/permissions.service';
@@ -43,6 +44,10 @@ export class AuthController {
   }
 
   @Post('login')
+  @Throttle({
+    default: { limit: 10, ttl: 60_000 },
+    hourly: { limit: 20, ttl: 3_600_000 },
+  })
   async login(
     @Body() loginDto: LoginDto,
     @Req() req: Request,
@@ -66,11 +71,12 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies?.[REFRESH_COOKIE_NAME];
+    const refreshToken: unknown = req.cookies?.[REFRESH_COOKIE_NAME];
     if (!refreshToken || typeof refreshToken !== 'string') {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -132,7 +138,10 @@ export class AuthController {
 
   @Get('permissions')
   @UseGuards(JwtAuthGuard)
-  async getPermissions(@CurrentUser() user: AuthenticatedUser, @Req() req: Request) {
+  async getPermissions(
+    @CurrentUser() user: AuthenticatedUser,
+    @Req() req: Request,
+  ) {
     const authorization = await this.permissionsService.getUserAuthorization(
       user.id,
       user.tenantId,

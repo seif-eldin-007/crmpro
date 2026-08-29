@@ -1,8 +1,5 @@
 import { Transform, Type } from 'class-transformer';
-import {
-  PaymentFrequency,
-  PaymentMethod,
-} from '@crmpro/database';
+import { PaymentFrequency, PaymentMethod } from '@crmpro/database';
 import {
   IsBoolean,
   IsDateString,
@@ -23,7 +20,9 @@ export class UpdateContractDto {
   @IsOptional()
   @IsString()
   @MaxLength(200)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   contractName?: string;
 
   @IsOptional()
@@ -39,7 +38,7 @@ export class UpdateContractDto {
   @IsOptional()
   @IsString()
   @Matches(/^[A-Z]{3}$/, { message: 'Currency must be a 3-letter ISO code' })
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.trim().toUpperCase() : value,
   )
   currency?: string;
@@ -85,6 +84,8 @@ export class UpdateContractDto {
   @ValidateIf((_, value) => value !== null)
   @IsString()
   @MaxLength(5000)
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.trim() : value,
+  )
   notes?: string | null;
 }

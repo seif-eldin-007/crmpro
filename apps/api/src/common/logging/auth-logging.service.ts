@@ -45,7 +45,11 @@ export class AuthLoggingService {
     this.log('refresh_failure', params, 'warn');
   }
 
-  logout(params: { userId: string; tenantId: string; sessionId: string }): void {
+  logout(params: {
+    userId: string;
+    tenantId: string;
+    sessionId: string;
+  }): void {
     this.log('logout', params);
   }
 

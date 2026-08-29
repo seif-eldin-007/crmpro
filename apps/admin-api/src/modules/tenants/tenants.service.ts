@@ -22,7 +22,11 @@ import { TenantOwnerService } from './services/tenant-owner.service';
 import { TenantProvisioningService } from './services/tenant-provisioning.service';
 import { TenantUsageService } from './services/tenant-usage.service';
 import { TenantsAuditService } from './services/tenants-audit.service';
-import type { ProvisionTenantResult, TenantDetail, TenantListItem } from './types/tenant.types';
+import type {
+  ProvisionTenantResult,
+  TenantDetail,
+  TenantListItem,
+} from './types/tenant.types';
 import { toTenantDetail, toTenantListItem } from './utils/tenant.mapper';
 
 const tenantListInclude = {
@@ -212,7 +216,11 @@ export class TenantsService {
     id: string,
     actorAdminId: string,
     metadata: RequestSecurityMetadata,
-  ): Promise<{ tenantId: string; status: TenantStatus; revokedSessions: number }> {
+  ): Promise<{
+    tenantId: string;
+    status: TenantStatus;
+    revokedSessions: number;
+  }> {
     const tenant = await this.findTenantOrThrow(id);
 
     if (tenant.status === TenantStatus.SUSPENDED) {

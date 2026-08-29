@@ -140,15 +140,11 @@ export class TenantOwnerService {
     });
 
     if (owners.length === 0) {
-      throw new InternalServerErrorException(
-        'Tenant has no owner user',
-      );
+      throw new InternalServerErrorException('Tenant has no owner user');
     }
 
     if (owners.length > 1) {
-      throw new InternalServerErrorException(
-        'Tenant has multiple owner users',
-      );
+      throw new InternalServerErrorException('Tenant has multiple owner users');
     }
 
     return owners[0];

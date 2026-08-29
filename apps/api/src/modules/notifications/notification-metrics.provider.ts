@@ -6,9 +6,7 @@ import {
 import { NotificationMetricsStore } from './metrics/notification-metrics.store';
 
 @Injectable()
-export class NotificationMetricsProvider
-  implements INotificationMetricsProvider
-{
+export class NotificationMetricsProvider implements INotificationMetricsProvider {
   constructor(
     private readonly notificationMetricsStore: NotificationMetricsStore,
   ) {}

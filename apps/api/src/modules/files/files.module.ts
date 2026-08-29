@@ -8,7 +8,13 @@ import { FilesController } from './files.controller';
 import { FilesService } from './files.service';
 
 @Module({
-  imports: [AuthRbacModule, QuotaModule, AuditModule, NotificationsModule, LeadAttachmentModule],
+  imports: [
+    AuthRbacModule,
+    QuotaModule,
+    AuditModule,
+    NotificationsModule,
+    LeadAttachmentModule,
+  ],
   controllers: [FilesController],
   providers: [FilesService],
   exports: [FilesService],

@@ -25,7 +25,9 @@ describe('UsersService quota enforcement', () => {
           provide: PrismaService,
           useValue: {
             user: { findFirst: jest.fn().mockResolvedValue(null) },
-            $transaction: jest.fn(async (callback) => callback({})),
+            $transaction: jest.fn((callback: (client: object) => unknown) =>
+              callback({}),
+            ),
           },
         },
         { provide: PasswordService, useValue: { hash: jest.fn() } },

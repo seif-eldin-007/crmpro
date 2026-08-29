@@ -11,10 +11,7 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor(
-    configService: ConfigService,
-    loggingService: LoggingService,
-  ) {
+  constructor(configService: ConfigService, loggingService: LoggingService) {
     const connectionString = configService.getOrThrow<string>('database.url');
     const pool = new Pool({ connectionString });
     const adapter = createPrismaPgAdapter(pool);
