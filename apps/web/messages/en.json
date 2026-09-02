@@ -1,0 +1,72 @@
+{
+  "shell": {
+    "navigation": "Navigation",
+    "commandPalette": {
+      "title": "Command Palette",
+      "description": "Search routes and actions",
+      "placeholder": "Search or jump to...",
+      "empty": "No results found.",
+      "actionsGroup": "Actions",
+      "accountGroup": "Account"
+    },
+    "topbar": {
+      "searchPlaceholder": "Search or jump to...",
+      "openCommandPalette": "Open command palette",
+      "new": "New",
+      "switchToLight": "Switch to light mode",
+      "switchToDark": "Switch to dark mode",
+      "openNavigation": "Open navigation",
+      "toggleSidebar": "Toggle sidebar",
+      "userMenu": {
+        "defaultName": "CRM User",
+        "defaultRole": "Member",
+        "profile": "Profile",
+        "support": "Support",
+        "settings": "Settings",
+        "logout": "Logout",
+        "loggingOut": "Signing out..."
+      }
+    }
+  },
+  "auth": {
+    "splash": {
+      "loading": "Loading workspace...",
+      "redirecting": "Redirecting to sign in...",
+      "checkingPermissions": "Checking permissions...",
+      "openingDashboard": "Opening dashboard..."
+    },
+    "login": {
+      "subtitle": "Sign in to your workspace",
+      "workspaceHeading": "Enter your workspace",
+      "workspaceHelp": "Use the workspace slug provided by your organization.",
+      "workspaceSlugLabel": "Workspace slug",
+      "continue": "Continue",
+      "credentialsHeading": "Sign in to your workspace",
+      "credentialsHelp": "Enter your account credentials to continue.",
+      "back": "Back",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@company.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "signIn": "Sign in",
+      "signingIn": "Signing in..."
+    },
+    "toast": {
+      "workspaceNotFoundTitle": "Workspace not found",
+      "workspaceNotFoundDescription": "Check the slug and try again.",
+      "workspaceLookupFailedTitle": "Unable to verify workspace",
+      "workspaceLookupFailedFallback": "Unable to verify workspace. Try again.",
+      "signInFailedTitle": "Sign in failed",
+      "signInFailedFallback": "Unable to sign in. Please try again.",
+      "signInSuccessTitle": "Welcome back",
+      "signInSuccessDescription": "Signed in as {name}",
+      "signedOutTitle": "Signed out",
+      "signedOutDescription": "You have been logged out."
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "working": "Working..."
+  }
+}

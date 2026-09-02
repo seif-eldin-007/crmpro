@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   CommandDialog,
   CommandEmpty,
@@ -28,6 +29,7 @@ import { useUIStore } from "@/stores/ui-store";
  */
 export function CommandPalette() {
   const router = useRouter();
+  const t = useTranslations("shell.commandPalette");
   const open = useUIStore((state) => state.commandPaletteOpen);
   const toggle = useUIStore((state) => state.toggleCommandPalette);
   const close = useUIStore((state) => state.closeCommandPalette);
@@ -66,7 +68,7 @@ export function CommandPalette() {
 
   const searchableGroups = [
     ...navGroups,
-    { label: "Account", routes: accountRoutes },
+    { label: t("accountGroup"), routes: accountRoutes },
   ]
     .map((group) => ({
       ...group,
@@ -81,13 +83,13 @@ export function CommandPalette() {
   const hitGroups = useMemo(() => {
     if (!searchResult) return [];
     const groups: Array<{ heading: string; items: SearchHit[] }> = [
-      { heading: "Tenants", items: searchResult.tenants },
-      { heading: "Plans", items: searchResult.plans },
-      { heading: "Contracts", items: searchResult.contracts },
-      { heading: "Admins", items: searchResult.admins },
+      { heading: t("hitGroups.tenants"), items: searchResult.tenants },
+      { heading: t("hitGroups.plans"), items: searchResult.plans },
+      { heading: t("hitGroups.contracts"), items: searchResult.contracts },
+      { heading: t("hitGroups.admins"), items: searchResult.admins },
     ];
     return groups.filter((group) => group.items.length > 0);
-  }, [searchResult]);
+  }, [searchResult, t]);
 
   const hasHits = hitGroups.length > 0;
   const searching =
@@ -97,18 +99,18 @@ export function CommandPalette() {
     <CommandDialog
       open={open}
       onOpenChange={(next) => (next ? undefined : close())}
-      title="Command Palette"
-      description="Search routes, records, and actions"
+      title={t("title")}
+      description={t("description")}
       className="cmd-palette-content"
     >
       <CommandInput
-        placeholder="Search tenants, plans, pages…"
+        placeholder={t("placeholder")}
         value={query}
         onValueChange={setQuery}
       />
       <CommandList>
         <CommandEmpty>
-          {searching ? "Searching…" : "No matching pages or records."}
+          {searching ? t("searching") : t("empty")}
         </CommandEmpty>
 
         {hitGroups.map((group) => (
@@ -155,7 +157,7 @@ export function CommandPalette() {
         {visibleActions.length > 0 && (
           <>
             <CommandSeparator />
-            <CommandGroup heading="Actions">
+            <CommandGroup heading={t("actionsGroup")}>
               {visibleActions.map((action) => {
                 const Icon = action.icon;
                 return (

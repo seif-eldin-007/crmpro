@@ -1,0 +1,64 @@
+{
+  "shell": {
+    "navigation": "Navigation",
+    "commandPalette": {
+      "title": "Command Palette",
+      "description": "Search routes, records, and actions",
+      "placeholder": "Search tenants, plans, pages…",
+      "empty": "No matching pages or records.",
+      "searching": "Searching…",
+      "actionsGroup": "Actions",
+      "accountGroup": "Account",
+      "hitGroups": {
+        "tenants": "Tenants",
+        "plans": "Plans",
+        "contracts": "Contracts",
+        "admins": "Admins"
+      }
+    },
+    "topbar": {
+      "searchPlaceholder": "Jump to page or action…",
+      "compactTitle": "Search or jump to...",
+      "openCommandPalette": "Open command palette",
+      "new": "New",
+      "switchToLight": "Switch to light mode",
+      "switchToDark": "Switch to dark mode",
+      "openNavigation": "Open navigation",
+      "toggleSidebar": "Toggle sidebar",
+      "userMenu": {
+        "defaultName": "Admin",
+        "defaultRole": "Operator",
+        "logout": "Logout",
+        "loggingOut": "Signing out..."
+      }
+    }
+  },
+  "auth": {
+    "splash": {
+      "loading": "Loading workspace...",
+      "redirecting": "Redirecting to sign in...",
+      "checkingPermissions": "Checking permissions...",
+      "openingDashboard": "Opening dashboard..."
+    },
+    "login": {
+      "subtitle": "CRMPro platform operations",
+      "heading": "Admin sign in",
+      "help": "Sign in with your CRMPro platform credentials.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "admin@crmpro.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "signIn": "Sign in",
+      "signingIn": "Signing in..."
+    },
+    "toast": {
+      "signInSuccessTitle": "Signed in successfully",
+      "signInFailedFallback": "Unable to sign in. Please try again."
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "working": "Working..."
+  }
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AppIcons } from "@/components/icons/app-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ export function CredentialsStep({
   onSubmit,
   isSubmitting,
 }: CredentialsStepProps) {
+  const t = useTranslations("auth.login");
   const canSubmit = email.trim().length > 0 && password.length > 0 && !isSubmitting;
 
   return (
@@ -49,7 +51,7 @@ export function CredentialsStep({
           disabled={isSubmitting}
         >
           <AppIcons.arrowLeft className="size-4" stroke={2} />
-          Back
+          {t("back")}
         </Button>
 
         <div className="space-y-3">
@@ -64,9 +66,9 @@ export function CredentialsStep({
           </div>
 
           <div className="space-y-1">
-            <h1 className="text-xl font-semibold tracking-tight">Sign in to your workspace</h1>
+            <h1 className="text-xl font-semibold tracking-tight">{t("credentialsHeading")}</h1>
             <p className="text-sm text-muted-foreground">
-              Enter your account credentials to continue.
+              {t("credentialsHelp")}
             </p>
           </div>
         </div>
@@ -74,7 +76,7 @@ export function CredentialsStep({
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("emailLabel")}</Label>
           <div className="relative">
             <AppIcons.mail
               className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -85,7 +87,7 @@ export function CredentialsStep({
               type="email"
               value={email}
               onChange={(event) => onEmailChange(event.target.value)}
-              placeholder="you@company.com"
+              placeholder={t("emailPlaceholder")}
               autoComplete="email"
               autoFocus
               disabled={isSubmitting}
@@ -95,7 +97,7 @@ export function CredentialsStep({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("passwordLabel")}</Label>
           <div className="relative">
             <AppIcons.lock
               className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -106,7 +108,7 @@ export function CredentialsStep({
               type="password"
               value={password}
               onChange={(event) => onPasswordChange(event.target.value)}
-              placeholder="Enter your password"
+              placeholder={t("passwordPlaceholder")}
               autoComplete="current-password"
               disabled={isSubmitting}
               className="pl-9"
@@ -119,11 +121,11 @@ export function CredentialsStep({
         {isSubmitting ? (
           <>
             <AppIcons.loader className="size-4 animate-spin" stroke={2} />
-            Signing in...
+            {t("signingIn")}
           </>
         ) : (
           <>
-            Sign in
+            {t("signIn")}
             <AppIcons.arrowRight className="size-4" stroke={2} />
           </>
         )}

@@ -34,6 +34,13 @@ export const queryKeys = {
     detail: (id: string) => ["leads", "detail", id] as const,
   },
 
+  leadSources: {
+    all: () => ["lead-sources"] as const,
+    list: (params?: ListQueryParams) =>
+      ["lead-sources", "list", params ?? {}] as const,
+    detail: (id: string) => ["lead-sources", "detail", id] as const,
+  },
+
   pipelines: {
     all: () => ["pipelines"] as const,
     list: (params?: ListQueryParams) =>

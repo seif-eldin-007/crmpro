@@ -4,43 +4,49 @@ import { AppIcons } from "@/components/icons/app-icons";
 
 const TOAST_ICON_PROPS = { className: "size-4", stroke: 2 } as const;
 
+/** Pre-translated copy for a toast, built by callers via `useTranslations`. */
+export interface ToastCopy {
+  title: string;
+  description?: string;
+}
+
 export const authToast = {
-  workspaceNotFound() {
-    toast.error("Workspace not found", {
+  workspaceNotFound(copy: ToastCopy) {
+    toast.error(copy.title, {
       id: "workspace-lookup",
-      description: "Check the slug and try again.",
+      description: copy.description,
       icon: createElement(AppIcons.buildingOff, TOAST_ICON_PROPS),
     });
   },
 
-  workspaceLookupFailed(message: string) {
-    toast.error("Unable to verify workspace", {
+  workspaceLookupFailed(copy: ToastCopy) {
+    toast.error(copy.title, {
       id: "workspace-lookup",
-      description: message,
+      description: copy.description,
       icon: createElement(AppIcons.alertCircle, TOAST_ICON_PROPS),
     });
   },
 
-  signInFailed(message: string) {
-    toast.error("Sign in failed", {
+  signInFailed(copy: ToastCopy) {
+    toast.error(copy.title, {
       id: "auth-sign-in",
-      description: message,
+      description: copy.description,
       icon: createElement(AppIcons.alertCircle, TOAST_ICON_PROPS),
     });
   },
 
-  signInSuccess(name: string) {
-    toast.success("Welcome back", {
+  signInSuccess(copy: ToastCopy) {
+    toast.success(copy.title, {
       id: "auth-sign-in",
-      description: `Signed in as ${name}`,
+      description: copy.description,
       icon: createElement(AppIcons.check, TOAST_ICON_PROPS),
     });
   },
 
-  signedOut() {
-    toast.info("Signed out", {
+  signedOut(copy: ToastCopy) {
+    toast.info(copy.title, {
       id: "auth-sign-out",
-      description: "You have been logged out.",
+      description: copy.description,
       icon: createElement(AppIcons.logout, TOAST_ICON_PROPS),
     });
   },

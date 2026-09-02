@@ -86,7 +86,7 @@ export const navGroups: NavGroup[] = [
         href: "/lead-sources",
         subtitle: "Where your leads come from",
         icon: AppIcons.leadSources,
-        requiredPermissions: ["lead_source.read"],
+        requiredPermissions: ["lead-source.read"],
         searchable: true,
         keywords: ["channels", "campaigns", "origin"],
       },

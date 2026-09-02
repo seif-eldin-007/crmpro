@@ -196,7 +196,7 @@ function ThreadPane({
     useSupportConversation(conversationId);
   const reply = useReplySupportConversation(conversationId);
   const resolve = useResolveSupportConversation();
-  const draftKey = `crmpro_support_draft_`;
+  const draftKey = `crmpro_support_draft_${conversationId}`;
   const [draft, setDraft] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem(draftKey) || "";

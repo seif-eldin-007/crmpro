@@ -2,10 +2,12 @@ packages:
   - "apps/*"
   - "packages/*"
 allowBuilds:
+  '@parcel/watcher': false
   '@prisma/engines': true
   '@scarf/scarf': true
+  '@swc/core': false
   argon2: true
-  bcrypt: set this to true or false
+  bcrypt: false
   msgpackr-extract: true
   prisma: true
   sharp: true

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { AppIcons } from "@/components/icons/app-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useLogin } from "@/features/auth/hooks/use-auth-actions";
 
 export function LoginForm() {
+  const t = useTranslations("auth.login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, isSubmitting } = useLogin();
@@ -26,15 +28,15 @@ export function LoginForm() {
       }}
     >
       <div className="space-y-1">
-        <h1 className="text-xl font-semibold tracking-tight">Admin sign in</h1>
+        <h1 className="text-xl font-semibold tracking-tight">{t("heading")}</h1>
         <p className="text-sm text-muted-foreground">
-          Sign in with your CRMPro platform credentials.
+          {t("help")}
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("emailLabel")}</Label>
           <div className="relative">
             <AppIcons.mail
               className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -45,7 +47,7 @@ export function LoginForm() {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="admin@crmpro.com"
+              placeholder={t("emailPlaceholder")}
               autoComplete="email"
               autoFocus
               disabled={isSubmitting}
@@ -55,7 +57,7 @@ export function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("passwordLabel")}</Label>
           <div className="relative">
             <AppIcons.lock
               className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -66,7 +68,7 @@ export function LoginForm() {
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Enter your password"
+              placeholder={t("passwordPlaceholder")}
               autoComplete="current-password"
               disabled={isSubmitting}
               className="pl-9"
@@ -79,11 +81,11 @@ export function LoginForm() {
         {isSubmitting ? (
           <>
             <AppIcons.loader className="size-4 animate-spin" stroke={2} />
-            Signing in...
+            {t("signingIn")}
           </>
         ) : (
           <>
-            Sign in
+            {t("signIn")}
             <AppIcons.arrowRight className="size-4" stroke={2} />
           </>
         )}

@@ -2,7 +2,7 @@
 
 **Goal:** take both apps from "works in dev" to shippable UX: no dead routes, guarded routes, resilient error states, realtime that works in production.
 **Order:** fourth.
-**Status:** ☐ not started
+**Status:** ☑ complete
 
 ---
 

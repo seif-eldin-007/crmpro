@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChangeUserRoleDialog } from "@/features/users/components/change-user-role-dialog";
+import { ConfirmUserActionDialog } from "@/features/users/components/confirm-user-action-dialog";
 import { CreateUserDialog } from "@/features/users/components/create-user-dialog";
 import { EditUserDialog } from "@/features/users/components/edit-user-dialog";
 import { ResetPasswordDialog } from "@/features/users/components/reset-password-dialog";
@@ -189,6 +190,7 @@ export function UsersPage() {
       <EditUserDialog />
       <ChangeUserRoleDialog />
       <ResetPasswordDialog />
+      <ConfirmUserActionDialog />
       <UserDetailDrawer />
     </div>
   );

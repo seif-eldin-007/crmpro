@@ -1,5 +1,17 @@
 import { create } from "zustand";
 
+/** Destructive/irreversible user actions that require an explicit confirmation. */
+export type ConfirmUserActionType =
+  | "deactivate"
+  | "reactivate"
+  | "revokeSessions";
+
+export interface ConfirmUserActionRequest {
+  action: ConfirmUserActionType;
+  userId: string;
+  userName: string;
+}
+
 interface UserUiState {
   createDialogOpen: boolean;
   editUserId: string | null;
@@ -7,6 +19,7 @@ interface UserUiState {
   resetPasswordUserId: string | null;
   drawerUserId: string | null;
   highlightedUserId: string | null;
+  confirmAction: ConfirmUserActionRequest | null;
   openCreateDialog: () => void;
   closeCreateDialog: () => void;
   openEditDialog: (userId: string) => void;
@@ -18,6 +31,8 @@ interface UserUiState {
   openDrawer: (userId: string) => void;
   closeDrawer: () => void;
   setHighlightedUserId: (userId: string | null) => void;
+  openConfirmAction: (request: ConfirmUserActionRequest) => void;
+  closeConfirmAction: () => void;
 }
 
 export const useUserUiStore = create<UserUiState>((set) => ({
@@ -27,6 +42,7 @@ export const useUserUiStore = create<UserUiState>((set) => ({
   resetPasswordUserId: null,
   drawerUserId: null,
   highlightedUserId: null,
+  confirmAction: null,
   openCreateDialog: () => set({ createDialogOpen: true }),
   closeCreateDialog: () => set({ createDialogOpen: false }),
   openEditDialog: (userId) => set({ editUserId: userId }),
@@ -39,4 +55,6 @@ export const useUserUiStore = create<UserUiState>((set) => ({
     set({ drawerUserId: userId, highlightedUserId: userId }),
   closeDrawer: () => set({ drawerUserId: null, highlightedUserId: null }),
   setHighlightedUserId: (userId) => set({ highlightedUserId: userId }),
+  openConfirmAction: (request) => set({ confirmAction: request }),
+  closeConfirmAction: () => set({ confirmAction: null }),
 }));

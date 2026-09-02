@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { navGroups } from "@/config/routes";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -155,6 +156,7 @@ export function Sidebar() {
 /* ─── Mobile sidebar (drawer) ─────────────────────────────────────────────── */
 
 export function MobileSidebar() {
+  const t = useTranslations("shell");
   const open = useUIStore((state) => state.mobileSidebarOpen);
   const closeMobileSidebar = useUIStore((state) => state.closeMobileSidebar);
 
@@ -169,7 +171,7 @@ export function MobileSidebar() {
         side="left"
         className="w-60 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
       >
-        <SheetTitle className="sr-only">Navigation</SheetTitle>
+        <SheetTitle className="sr-only">{t("navigation")}</SheetTitle>
         <SidebarBrand collapsed={false} />
         <SidebarNav collapsed={false} onNavigate={closeMobileSidebar} />
       </SheetContent>

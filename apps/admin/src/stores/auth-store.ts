@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { AuthStatus, AuthUser, AuthUserRole } from "@/types/auth";
+import { clearSessionHint, setSessionHint } from "@/lib/session-hint";
 
 interface AuthState {
   status: AuthStatus;
@@ -27,12 +28,18 @@ const initialState = {
 export const useAuthStore = create<AuthState>((set) => ({
   ...initialState,
 
-  setStatus: (status) => set({ status }),
+  setStatus: (status) => {
+    // Keep the middleware session-hint cookie in sync with real auth state.
+    if (status === "authenticated") setSessionHint();
+    if (status === "unauthenticated") clearSessionHint();
+    set({ status });
+  },
   setAccessToken: (accessToken) => set({ accessToken }),
   setUser: (user) => set({ user }),
   setRole: (role) => set({ role }),
   setPermissions: (permissions) => set({ permissions }),
   clearAuth: () => {
+    clearSessionHint();
     set({
       status: "unauthenticated",
       accessToken: null,

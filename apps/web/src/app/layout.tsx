@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 import "./globals.css";
 import { AppProviders } from "@/providers/app-providers";
+import { localeDir } from "@/i18n/config";
 
 export const metadata: Metadata = {
   title: "CRMPro",
@@ -22,18 +25,27 @@ const themeInitScript = `
   })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={localeDir(locale)}
+      className="h-full antialiased"
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-full">
-        <AppProviders>{children}</AppProviders>
+        <NextIntlClientProvider>
+          <AppProviders>{children}</AppProviders>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { useLeads, useLeadsListParams } from "@/features/leads/hooks";
 import { useLeadsUrlFilters } from "@/features/leads/hooks/use-leads-url-filters";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import {
   getSelectedLeadIds,
   useLeadsTableStore,
@@ -34,7 +35,8 @@ import { MoveStageDialog } from "./move-stage-dialog";
 
 export function LeadsPage() {
   const [search, setSearch] = useState("");
-  useLeadsUrlFilters();
+  const debouncedSearch = useDebouncedValue(search, 400);
+  useLeadsUrlFilters({ debouncedSearch, setSearch });
   const listParams = useLeadsListParams(search);
 
   const sortBy = useLeadsTableStore((s) => s.sortBy);

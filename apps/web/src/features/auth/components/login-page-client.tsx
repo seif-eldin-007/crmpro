@@ -2,12 +2,14 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AuthSplash } from "@/features/auth/components/auth-splash";
 import { LoginFlow } from "@/features/auth/components/login-flow";
 import { useAuthStore } from "@/stores/auth-store";
 
 export function LoginPageClient() {
   const router = useRouter();
+  const t = useTranslations("auth");
   const status = useAuthStore((state) => state.status);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ export function LoginPageClient() {
   }
 
   if (status === "authenticated") {
-    return <AuthSplash message="Opening dashboard..." />;
+    return <AuthSplash message={t("splash.openingDashboard")} />;
   }
 
   return (
@@ -33,7 +35,7 @@ export function LoginPageClient() {
           </div>
           <div>
             <span className="text-lg font-semibold tracking-tight">CRMPro</span>
-            <p className="text-xs text-muted-foreground">Sign in to your workspace</p>
+            <p className="text-xs text-muted-foreground">{t("login.subtitle")}</p>
           </div>
         </div>
 

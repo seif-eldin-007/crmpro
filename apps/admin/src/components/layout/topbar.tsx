@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppIcons } from "@/components/icons/app-icons";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -23,6 +24,7 @@ import { useUIStore } from "@/stores/ui-store";
 import { useAuthStore } from "@/stores/auth-store";
 
 function CommandTrigger({ onOpen }: { onOpen?: () => void }) {
+  const t = useTranslations("shell.topbar");
   const openCommandPalette = useUIStore((s) => s.openCommandPalette);
   const [isMac, setIsMac] = useState(false);
 
@@ -51,7 +53,7 @@ function CommandTrigger({ onOpen }: { onOpen?: () => void }) {
         stroke={2}
       />
       <span className="flex-1 select-none text-left text-[13px]">
-        Jump to page or action…
+        {t("searchPlaceholder")}
       </span>
       <kbd className="pointer-events-none hidden select-none items-center rounded border border-input/60 bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:inline-flex">
         {isMac ? "⌘K" : "Ctrl K"}
@@ -61,6 +63,7 @@ function CommandTrigger({ onOpen }: { onOpen?: () => void }) {
 }
 
 function CompactCommandTrigger({ onOpen }: { onOpen?: () => void }) {
+  const t = useTranslations("shell.topbar");
   const openCommandPalette = useUIStore((s) => s.openCommandPalette);
 
   return (
@@ -69,8 +72,8 @@ function CompactCommandTrigger({ onOpen }: { onOpen?: () => void }) {
       variant="ghost"
       size="icon"
       className="h-8 w-8 shrink-0 rounded-lg transition-all duration-150 xl:hidden"
-      aria-label="Open command palette"
-      title="Search or jump to..."
+      aria-label={t("openCommandPalette")}
+      title={t("compactTitle")}
       onClick={() => {
         onOpen?.();
         openCommandPalette();
@@ -88,6 +91,7 @@ function QuickActions({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
+  const t = useTranslations("shell.topbar");
   const router = useRouter();
   const { canAccessRoute } = usePermissions();
   const visible = quickActions.filter(canAccessRoute);
@@ -106,7 +110,7 @@ function QuickActions({
           )}
         >
           <AppIcons.create className="size-3.5" stroke={2.5} />
-          <span className="hidden sm:inline">New</span>
+          <span className="hidden sm:inline">{t("new")}</span>
           <span className="mx-0.5 hidden h-3.5 w-px bg-primary-foreground/25 sm:block" />
           <AppIcons.chevronDown
             className="hidden size-3 text-primary-foreground/85 sm:block"
@@ -136,6 +140,7 @@ function QuickActions({
 }
 
 function ThemeToggle() {
+  const t = useTranslations("shell.topbar");
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
@@ -170,8 +175,8 @@ function ThemeToggle() {
       variant="ghost"
       size="icon"
       className="h-8 w-8 shrink-0 rounded-lg transition-all duration-150"
-      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={theme === "dark" ? t("switchToLight") : t("switchToDark")}
+      title={theme === "dark" ? t("switchToLight") : t("switchToDark")}
       onClick={toggleTheme}
     >
       <Icon className="size-[18px]" stroke={1.75} />
@@ -186,12 +191,13 @@ function UserMenu({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
+  const t = useTranslations("shell.topbar");
   const user = useAuthStore((s) => s.user);
   const role = useAuthStore((s) => s.role);
   const { logout, isLoggingOut } = useLogout();
 
-  const name = user?.fullName ?? "Admin";
-  const roleName = role?.name ?? "Operator";
+  const name = user?.fullName ?? t("userMenu.defaultName");
+  const roleName = role?.name ?? t("userMenu.defaultRole");
   const initials = name
     .split(" ")
     .map((part) => part[0])
@@ -239,7 +245,7 @@ function UserMenu({
           }}
         >
           <AppIcons.logout className="size-4" stroke={1.75} />
-          {isLoggingOut ? "Signing out..." : "Logout"}
+          {isLoggingOut ? t("userMenu.loggingOut") : t("userMenu.logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -247,6 +253,7 @@ function UserMenu({
 }
 
 export function Topbar() {
+  const t = useTranslations("shell.topbar");
   const pathname = usePathname();
   const route = findRouteByPath(pathname);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
@@ -271,7 +278,7 @@ export function Topbar() {
         variant="ghost"
         size="icon"
         className="h-8 w-8 shrink-0 rounded-lg md:hidden"
-        aria-label="Open navigation"
+        aria-label={t("openNavigation")}
         onClick={openMobileSidebar}
       >
         <AppIcons.menu className="size-4" stroke={2} />
@@ -281,7 +288,7 @@ export function Topbar() {
         variant="ghost"
         size="icon"
         className="hidden h-8 w-8 rounded-lg transition-all duration-150 md:inline-flex"
-        aria-label="Toggle sidebar"
+        aria-label={t("toggleSidebar")}
         onClick={toggleSidebar}
       >
         {collapsed ? (

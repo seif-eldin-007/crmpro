@@ -10,8 +10,45 @@ import { useRealtimeStore } from "@/stores/realtime-store";
 const playNotificationSound = () => {
   const audio = new Audio("/sounds/notification.mp3");
   audio.volume = 0.5;
-  audio.play().catch((err) => console.log("Audio play error:", err));
+  audio.play().catch(() => {
+    // Autoplay can be blocked by the browser; a missed chime is not an error.
+  });
 };
+
+/**
+ * Resolves the realtime (socket.io) gateway origin.
+ *
+ * The Next rewrite proxies only `/api/*`, not `/socket.io/*`, so the socket needs
+ * a real origin rather than the same-origin API path. Preference:
+ *   1. NEXT_PUBLIC_SSE_URL (explicit realtime gateway)
+ *   2. NEXT_PUBLIC_API_URL when absolute
+ *   3. the current host (works when a reverse proxy routes /socket.io here)
+ * Returns null when nothing is resolvable so realtime can fail loud instead of
+ * silently dialing a hardcoded localhost port.
+ */
+function resolveSocketOrigin(): string | null {
+  const toOrigin = (value: string): string | null => {
+    const trimmed = value.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "");
+    return /^https?:\/\//.test(trimmed) ? trimmed : null;
+  };
+
+  const sse = process.env.NEXT_PUBLIC_SSE_URL;
+  if (sse) {
+    const origin = toOrigin(sse);
+    if (origin) return origin;
+  }
+
+  const api = process.env.NEXT_PUBLIC_API_URL;
+  if (api) {
+    const origin = toOrigin(api);
+    if (origin) return origin;
+  }
+
+  // Relative API base (same-origin): requires /socket.io reachable on this host.
+  if (typeof window !== "undefined") return window.location.origin;
+
+  return null;
+}
 
 export function useRealtimeStream() {
   const queryClient = useQueryClient();
@@ -32,16 +69,23 @@ export function useRealtimeStream() {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
+        setSocket(null);
       }
       return;
     }
 
-    // Next.js rewrite buffering breaks SSE, but for WebSockets we can use the direct URL
-    // Socket.io defaults to polling then upgrades to websockets.
-    const socketBase = process.env.NEXT_PUBLIC_SSE_URL?.replace('/api/v1', '') || process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '');
-    const socketUrl = socketBase || "http://localhost:3000";
+    // The Next rewrite only proxies /api/*, not /socket.io/*, so the socket needs
+    // a real gateway origin (see resolveSocketOrigin). No localhost fallback: a
+    // misconfigured build must fail loud rather than silently hit a dev port.
+    const socketOrigin = resolveSocketOrigin();
+    if (!socketOrigin) {
+      console.error(
+        "[realtime] Could not resolve a socket origin. Set NEXT_PUBLIC_SSE_URL to the realtime gateway origin. Realtime is disabled.",
+      );
+      return;
+    }
 
-    const socket = io(socketUrl, {
+    const socket = io(socketOrigin, {
       auth: {
         token: accessToken
       },
@@ -54,8 +98,15 @@ export function useRealtimeStream() {
     socketRef.current = socket;
     setSocket(socket);
 
+    // First `connect` is the initial handshake; any later one means the socket
+    // dropped and reconnected, so backfill everything we may have missed.
+    let hasConnected = false;
     socket.on("connect", () => {
-      console.log("WebSocket connected");
+      if (!hasConnected) {
+        hasConnected = true;
+        return;
+      }
+      void queryClientRef.current.invalidateQueries({ refetchType: "active" });
     });
 
     socket.on("invalidate", (payload) => {
@@ -93,10 +144,6 @@ export function useRealtimeStream() {
 
     socket.on("connect_error", (err) => {
       console.error("WebSocket connection error:", err.message);
-    });
-
-    socket.on("disconnect", (reason) => {
-      console.log("WebSocket disconnected:", reason);
     });
 
     return () => {

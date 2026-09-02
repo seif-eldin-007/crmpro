@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AppIcons } from "@/components/icons/app-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ export function WorkspaceStep({
   workspace,
   onContinue,
 }: WorkspaceStepProps) {
+  const t = useTranslations("auth.login");
   const canContinue = status === "exists" && workspace !== null;
   const showMissing = status === "missing";
   const showExists = status === "exists" && workspace;
@@ -35,15 +37,15 @@ export function WorkspaceStep({
           <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
             <AppIcons.building className="size-4" stroke={1.75} />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight">Enter your workspace</h1>
+          <h1 className="text-xl font-semibold tracking-tight">{t("workspaceHeading")}</h1>
         </div>
         <p className="text-sm text-muted-foreground">
-          Use the workspace slug provided by your organization.
+          {t("workspaceHelp")}
         </p>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="workspace-slug">Workspace slug</Label>
+        <Label htmlFor="workspace-slug">{t("workspaceSlugLabel")}</Label>
         <div className="relative">
           <AppIcons.building
             className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -99,7 +101,7 @@ export function WorkspaceStep({
         disabled={!canContinue || showChecking}
         onClick={onContinue}
       >
-        Continue
+        {t("continue")}
         <AppIcons.arrowRight className="size-4" stroke={2} />
       </Button>
     </div>

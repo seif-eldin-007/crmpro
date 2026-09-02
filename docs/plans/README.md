@@ -8,7 +8,7 @@ Each plan file is self-contained with acceptance criteria and a definition of do
 | 01 | [Security Hardening](./01-security-hardening.md) | rate limiting, CORS fail-closed, WebSocket auth, RBAC fail-closed, cookie parity, token reuse detection | ✅ complete |
 | 02 | [Quality Gates](./02-quality-gates.md) | fix red tests, turbo test/lint/typecheck tasks, GitHub Actions CI | ✅ complete |
 | 03 | [Commercial Correctness](./03-commercial-correctness.md) | plan snapshots, termination lifecycle, suspended-tenant workers, atomic audit | ✅ complete |
-| 04 | [Frontend Finish](./04-frontend-finish.md) | dead routes, route guards, error boundaries, realtime prod config, i18n groundwork | ☐ not started |
+| 04 | [Frontend Finish](./04-frontend-finish.md) | dead routes, route guards, error boundaries, realtime prod config, i18n groundwork | ✅ complete |
 | 05 | [Ops Foundation](./05-ops-foundation.md) | Dockerfiles, prod compose, backups, alerting — **deferred until hosting/VPS is chosen** | ☐ blocked |
 
 ## Working agreement

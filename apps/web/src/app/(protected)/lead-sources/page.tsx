@@ -1,13 +1,11 @@
-import { PagePlaceholder } from "@/components/crm/page-placeholder";
-import { getRoute } from "@/config/routes";
+import { Suspense } from "react";
+import { LeadSourcesPage } from "@/features/lead-sources/components/lead-sources-page";
+import { LeadSourcesSkeleton } from "@/features/lead-sources/components/lead-sources-skeleton";
 
-export default function LeadSourcesPage() {
-  const route = getRoute("/lead-sources");
+export default function LeadSourcesRoutePage() {
   return (
-    <PagePlaceholder
-      title={route?.label ?? "Lead Sources"}
-      subtitle={route?.subtitle}
-      icon={route?.icon}
-    />
+    <Suspense fallback={<LeadSourcesSkeleton />}>
+      <LeadSourcesPage />
+    </Suspense>
   );
 }

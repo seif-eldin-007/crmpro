@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { authApi } from "@/features/auth/api";
 import { hydrateAuthAfterLogin } from "@/features/auth/session";
 import { authToast } from "@/features/auth/utils/auth-toast";
@@ -11,6 +12,7 @@ import { useAuthStore } from "@/stores/auth-store";
 
 export function useLogout() {
   const router = useRouter();
+  const t = useTranslations("auth.toast");
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -24,16 +26,20 @@ export function useLogout() {
       clearAuth();
       getQueryClient()?.clear();
       setIsLoggingOut(false);
-      authToast.signedOut();
+      authToast.signedOut({
+        title: t("signedOutTitle"),
+        description: t("signedOutDescription"),
+      });
       router.replace("/login");
     }
-  }, [clearAuth, router]);
+  }, [clearAuth, router, t]);
 
   return { logout, isLoggingOut };
 }
 
 export function useLogin() {
   const router = useRouter();
+  const t = useTranslations("auth.toast");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const login = useCallback(
@@ -51,19 +57,25 @@ export function useLogin() {
           deviceName: "CRM Web",
         });
         await hydrateAuthAfterLogin(result.accessToken);
-        authToast.signInSuccess(result.user.name);
+        authToast.signInSuccess({
+          title: t("signInSuccessTitle"),
+          description: t("signInSuccessDescription", { name: result.user.name }),
+        });
         router.replace("/dashboard");
       } catch (error) {
         const message =
           error instanceof ApiError
             ? error.message
-            : "Unable to sign in. Please try again.";
-        authToast.signInFailed(message);
+            : t("signInFailedFallback");
+        authToast.signInFailed({
+          title: t("signInFailedTitle"),
+          description: message,
+        });
       } finally {
         setIsSubmitting(false);
       }
     },
-    [router],
+    [router, t],
   );
 
   return { login, isSubmitting };

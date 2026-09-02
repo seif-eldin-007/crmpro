@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   CommandDialog,
   CommandEmpty,
@@ -27,6 +28,7 @@ import { useUIStore } from "@/stores/ui-store";
  */
 export function CommandPalette() {
   const router = useRouter();
+  const t = useTranslations("shell.commandPalette");
   const open = useUIStore((state) => state.commandPaletteOpen);
   const toggle = useUIStore((state) => state.toggleCommandPalette);
   const close = useUIStore((state) => state.closeCommandPalette);
@@ -50,7 +52,7 @@ export function CommandPalette() {
 
   const searchableGroups = [
     ...navGroups,
-    { label: "Account", routes: accountRoutes },
+    { label: t("accountGroup"), routes: accountRoutes },
   ]
     .map((group) => ({
       ...group,
@@ -66,13 +68,13 @@ export function CommandPalette() {
     <CommandDialog
       open={open}
       onOpenChange={(next) => (next ? undefined : close())}
-      title="Command Palette"
-      description="Search routes and actions"
+      title={t("title")}
+      description={t("description")}
       className="cmd-palette-content"
     >
-      <CommandInput placeholder="Search or jump to..." />
+      <CommandInput placeholder={t("placeholder")} />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>{t("empty")}</CommandEmpty>
 
         {searchableGroups.map((group) => (
           <CommandGroup key={group.label} heading={group.label}>
@@ -95,7 +97,7 @@ export function CommandPalette() {
         {visibleActions.length > 0 && (
           <>
             <CommandSeparator />
-            <CommandGroup heading="Actions">
+            <CommandGroup heading={t("actionsGroup")}>
               {visibleActions.map((action) => {
                 const Icon = action.icon;
                 return (

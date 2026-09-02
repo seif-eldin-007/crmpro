@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ApiError } from "@/lib/api/client";
 import { toast } from "@/lib/toast";
 import { authApi } from "@/features/auth/api";
@@ -12,19 +13,20 @@ import { useAuthStore } from "@/stores/auth-store";
 export function useLogin() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const t = useTranslations("auth.toast");
 
   async function login(email: string, password: string) {
     setIsSubmitting(true);
     try {
       const result = await authApi.login({ email, password });
       await hydrateAuthAfterLogin(result.accessToken);
-      toast.success("Signed in successfully");
+      toast.success(t("signInSuccessTitle"));
       router.replace("/dashboard");
     } catch (error) {
       const message =
         error instanceof ApiError
           ? error.message
-          : "Unable to sign in. Please try again.";
+          : t("signInFailedFallback");
       toast.error(message);
       throw error;
     } finally {

@@ -12,11 +12,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  useDeactivateUser,
-  useReactivateUser,
-  useRevokeUserSessions,
-} from "@/features/users/mutations";
 import { useUser } from "@/features/users/hooks";
 import { useUserUiStore } from "@/features/users/stores/user-ui-store";
 import type { UserDetail } from "@/features/users/types";
@@ -40,13 +35,11 @@ export function UserDetailDrawer() {
   const openResetPasswordDialog = useUserUiStore(
     (s) => s.openResetPasswordDialog,
   );
+  const openConfirmAction = useUserUiStore((s) => s.openConfirmAction);
   const currentUserId = useAuthStore((s) => s.user?.id);
   const { can } = usePermissions();
 
   const { data: user, isLoading, isError } = useUser(drawerUserId ?? undefined);
-  const deactivateUser = useDeactivateUser();
-  const reactivateUser = useReactivateUser();
-  const revokeSessions = useRevokeUserSessions();
 
   const isSelf = currentUserId === drawerUserId;
   const open = Boolean(drawerUserId);
@@ -91,12 +84,27 @@ export function UserDetailDrawer() {
               onEditName={() => openEditDialog(user.id)}
               onChangeRole={() => openChangeRoleDialog(user.id)}
               onResetPassword={() => openResetPasswordDialog(user.id)}
-              onDeactivate={() => void deactivateUser.mutateAsync(user.id)}
-              onReactivate={() => void reactivateUser.mutateAsync(user.id)}
-              onRevokeSessions={() => void revokeSessions.mutateAsync(user.id)}
-              deactivating={deactivateUser.isPending}
-              reactivating={reactivateUser.isPending}
-              revoking={revokeSessions.isPending}
+              onDeactivate={() =>
+                openConfirmAction({
+                  action: "deactivate",
+                  userId: user.id,
+                  userName: user.fullName,
+                })
+              }
+              onReactivate={() =>
+                openConfirmAction({
+                  action: "reactivate",
+                  userId: user.id,
+                  userName: user.fullName,
+                })
+              }
+              onRevokeSessions={() =>
+                openConfirmAction({
+                  action: "revokeSessions",
+                  userId: user.id,
+                  userName: user.fullName,
+                })
+              }
             />
           ) : null}
         </div>
@@ -116,9 +124,6 @@ function UserDetailBody({
   onDeactivate,
   onReactivate,
   onRevokeSessions,
-  deactivating,
-  reactivating,
-  revoking,
 }: {
   user: UserDetail;
   isSelf: boolean;
@@ -130,9 +135,6 @@ function UserDetailBody({
   onDeactivate: () => void;
   onReactivate: () => void;
   onRevokeSessions: () => void;
-  deactivating: boolean;
-  reactivating: boolean;
-  revoking: boolean;
 }) {
   const permissionGroups = useMemo(
     () => groupGrantedPermissions(user.permissions),
@@ -227,7 +229,6 @@ function UserDetailBody({
                 icon={AppIcons.userOff}
                 label="Deactivate"
                 onClick={onDeactivate}
-                disabled={deactivating}
                 tone="danger"
               />
             ) : (
@@ -235,7 +236,6 @@ function UserDetailBody({
                 icon={AppIcons.check}
                 label="Reactivate"
                 onClick={onReactivate}
-                disabled={reactivating}
               />
             )
           ) : null}
@@ -244,7 +244,6 @@ function UserDetailBody({
               icon={AppIcons.logout}
               label="Revoke sessions"
               onClick={onRevokeSessions}
-              disabled={revoking}
               tone="danger"
             />
           ) : null}

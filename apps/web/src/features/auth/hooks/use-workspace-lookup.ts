@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { authApi } from "@/features/auth/api";
 import { authToast } from "@/features/auth/utils/auth-toast";
 import {
@@ -21,6 +22,7 @@ export type WorkspaceLookupStatus =
 const DEBOUNCE_MS = 500;
 
 export function useWorkspaceLookup(rawSlug: string) {
+  const t = useTranslations("auth.toast");
   const slug = normalizeWorkspaceSlug(rawSlug);
   const [status, setStatus] = useState<WorkspaceLookupStatus>("idle");
   const [workspace, setWorkspace] = useState<WorkspaceLookupResult | null>(null);
@@ -60,21 +62,26 @@ export function useWorkspaceLookup(rawSlug: string) {
         setWorkspace(null);
         if (error instanceof ApiError && error.status === 404) {
           setStatus("missing");
-          authToast.workspaceNotFound();
+          authToast.workspaceNotFound({
+            title: t("workspaceNotFoundTitle"),
+            description: t("workspaceNotFoundDescription"),
+          });
           return;
         }
 
         setStatus("error");
-        authToast.workspaceLookupFailed(
-          error instanceof ApiError
-            ? error.message
-            : "Unable to verify workspace. Try again.",
-        );
+        authToast.workspaceLookupFailed({
+          title: t("workspaceLookupFailedTitle"),
+          description:
+            error instanceof ApiError
+              ? error.message
+              : t("workspaceLookupFailedFallback"),
+        });
       }
     }, DEBOUNCE_MS);
 
     return () => window.clearTimeout(timer);
-  }, [slug]);
+  }, [slug, t]);
 
   return {
     slug,
