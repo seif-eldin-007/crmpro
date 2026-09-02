@@ -2,7 +2,7 @@
 
 **Goal:** make plan/contract/termination semantics safe for real paying tenants — no retroactive entitlement changes, predictable end-of-contract behavior.
 **Order:** third.
-**Status:** ☐ not started
+**Status:** ☑ complete
 
 ---
 

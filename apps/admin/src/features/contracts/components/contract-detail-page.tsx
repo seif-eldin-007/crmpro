@@ -28,7 +28,12 @@ import {
   PAYMENT_METHOD_LABELS,
 } from "@/features/contracts/types";
 import { usePermissions } from "@/hooks/use-permissions";
-import { formatDate, formatMoney, formatNumber } from "@/lib/format";
+import {
+  formatDate,
+  formatMoney,
+  formatNumber,
+  formatStorageBytes,
+} from "@/lib/format";
 
 interface ContractDetailPageProps {
   contractId: string;
@@ -95,6 +100,7 @@ export function ContractDetailPage({ contractId }: ContractDetailPageProps) {
     paymentFrequency: contract.paymentFrequency,
     contractStartAt: contract.contractStartAt,
     contractEndAt: contract.contractEndAt,
+    gracePeriodDays: contract.gracePeriodDays,
     autoRenew: contract.autoRenew,
   };
 
@@ -217,6 +223,48 @@ export function ContractDetailPage({ contractId }: ContractDetailPageProps) {
           />
         </DetailCard>
 
+        <DetailCard title="Plan at signing">
+          {contract.planSnapshot ? (
+            <>
+              <DetailRow
+                label="Plan"
+                value={contract.planSnapshot.name || "—"}
+              />
+              <DetailRow
+                label="Max users"
+                value={limitLabel(contract.planSnapshot.quotas.maxUsers)}
+              />
+              <DetailRow
+                label="Max leads"
+                value={limitLabel(contract.planSnapshot.quotas.maxLeads)}
+              />
+              <DetailRow
+                label="Max projects"
+                value={limitLabel(contract.planSnapshot.quotas.maxProjects)}
+              />
+              <DetailRow
+                label="Max storage"
+                value={
+                  contract.planSnapshot.quotas.maxStorageBytes !== null
+                    ? formatStorageBytes(
+                        Number(contract.planSnapshot.quotas.maxStorageBytes),
+                      )
+                    : "Unlimited"
+                }
+              />
+              <DetailRow
+                label="Features"
+                value={featureFlagsLabel(contract.planSnapshot.featureFlags)}
+              />
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Legacy contract — signed before plan snapshots existed. Uses the
+              current live plan values.
+            </p>
+          )}
+        </DetailCard>
+
         <DetailCard title="Meta">
           <DetailRow
             label="Plan"
@@ -297,4 +345,16 @@ function DetailRow({ label, value }: { label: string; value: string }) {
       <span className="text-right tabular-nums text-foreground">{value}</span>
     </div>
   );
+}
+
+function limitLabel(value: number | null) {
+  return value === null ? "Unlimited" : formatNumber(value);
+}
+
+function featureFlagsLabel(flags: Record<string, boolean>) {
+  const enabled = Object.entries(flags)
+    .filter(([, enabledFlag]) => enabledFlag)
+    .map(([key]) => key);
+
+  return enabled.length > 0 ? enabled.join(", ") : "None";
 }

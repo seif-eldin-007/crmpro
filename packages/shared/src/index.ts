@@ -48,4 +48,9 @@ export {
   computeContractAccessEndAt,
   isWithinContractGrace,
   type ContractGraceInput,
+  buildPlanSnapshot,
+  parsePlanSnapshot,
+  type PlanSnapshot,
+  type PlanSnapshotQuotas,
+  type PlanSnapshotSource,
 } from './billing';

@@ -4,6 +4,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ContractStatus, Prisma } from '@crmpro/database';
+import { parsePlanSnapshot, type PlanSnapshotQuotas } from '@crmpro/shared';
 import { PrismaService } from '../prisma/prisma.service';
 import { QUOTA_EXCEEDED_MESSAGES } from './quota.constants';
 import type {
@@ -23,6 +25,17 @@ const tenantQuotaSelect = {
     },
   },
 } as const;
+
+/** Structural reader satisfied by both PrismaService and a transaction client. */
+type SnapshotReader = {
+  tenantContract: {
+    findFirst(args: {
+      where: Prisma.TenantContractWhereInput;
+      select: { planSnapshot: true };
+      orderBy: { createdAt: 'desc' };
+    }): Promise<{ planSnapshot: Prisma.JsonValue } | null>;
+  };
+};
 
 @Injectable()
 export class QuotaService {
@@ -195,6 +208,16 @@ export class QuotaService {
   }
 
   async getTenantPlanLimits(tenantId: string): Promise<TenantPlanLimits> {
+    const snapshot = await this.loadSnapshotQuotas(this.prisma, tenantId);
+
+    if (snapshot) {
+      return {
+        maxUsers: snapshot.maxUsers,
+        maxLeads: snapshot.maxLeads,
+        maxProjects: snapshot.maxProjects,
+      };
+    }
+
     const tenant = await this.prisma.tenant.findFirst({
       where: { id: tenantId, deletedAt: null },
       select: {
@@ -221,6 +244,30 @@ export class QuotaService {
   ): Promise<TenantQuotaContext> {
     await this.lockTenantRow(tx, tenantId);
 
+    const snapshot = await this.loadSnapshotQuotas(tx, tenantId);
+
+    if (snapshot) {
+      const tenant = await tx.tenant.findFirst({
+        where: { id: tenantId, deletedAt: null },
+        select: { storageUsedBytes: true },
+      });
+
+      if (!tenant) {
+        throw new NotFoundException('Tenant not found');
+      }
+
+      return {
+        maxUsers: snapshot.maxUsers,
+        maxLeads: snapshot.maxLeads,
+        maxProjects: snapshot.maxProjects,
+        storageUsedBytes: tenant.storageUsedBytes,
+        maxStorageBytes:
+          snapshot.maxStorageBytes !== null
+            ? BigInt(snapshot.maxStorageBytes)
+            : null,
+      };
+    }
+
     const tenant = await tx.tenant.findFirst({
       where: { id: tenantId, deletedAt: null },
       select: tenantQuotaSelect,
@@ -234,6 +281,34 @@ export class QuotaService {
       ...tenant.subscriptionPlan,
       storageUsedBytes: tenant.storageUsedBytes,
     };
+  }
+
+  /**
+   * Quotas frozen in the active contract's planSnapshot take precedence over
+   * the live SubscriptionPlan row, so editing a plan never retroactively
+   * changes a signed tenant's limits. Returns null for legacy contracts
+   * without a snapshot (caller falls back to the live plan).
+   */
+  private async loadSnapshotQuotas(
+    client: SnapshotReader,
+    tenantId: string,
+  ): Promise<PlanSnapshotQuotas | null> {
+    const contract = await client.tenantContract.findFirst({
+      where: {
+        tenantId,
+        status: ContractStatus.ACTIVE,
+        deletedAt: null,
+      },
+      select: { planSnapshot: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!contract) {
+      return null;
+    }
+
+    const snapshot = parsePlanSnapshot(contract.planSnapshot);
+    return snapshot ? snapshot.quotas : null;
   }
 
   private async sumPendingUploadBytes(

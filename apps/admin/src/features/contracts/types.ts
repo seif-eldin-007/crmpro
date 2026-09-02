@@ -1,3 +1,4 @@
+import type { PlanSnapshot } from "@crmpro/shared";
 import type { ListQueryParams, PaginatedResponse } from "@/types/pagination";
 
 export const CONTRACT_STATUSES = [
@@ -52,6 +53,7 @@ export interface ContractListItem {
   paymentFrequency: PaymentFrequency;
   contractStartAt: string;
   contractEndAt: string | null;
+  gracePeriodDays: number | null;
   autoRenew: boolean;
 }
 
@@ -60,6 +62,8 @@ export interface ContractDetail {
   contractName: string | null;
   status: ContractStatus;
   plan: ContractPlanSummary;
+  /** Frozen plan terms captured at signing; null for legacy contracts. */
+  planSnapshot: PlanSnapshot | null;
   tenantId: string | null;
   agreedPrice: number;
   currency: string;

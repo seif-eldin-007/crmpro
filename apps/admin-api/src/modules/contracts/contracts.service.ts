@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ContractStatus, Prisma } from '@crmpro/database';
-import { computeContractAccessEndAt } from '@crmpro/shared';
+import { ContractStatus, Prisma, TenantStatus } from '@crmpro/database';
+import { buildPlanSnapshot, computeContractAccessEndAt } from '@crmpro/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import {
   buildPaginatedResponse,
@@ -88,40 +88,48 @@ export class ContractsService {
     actorAdminId: string,
     metadata: RequestSecurityMetadata,
   ): Promise<ContractDetail> {
-    await this.assertPlanActive(dto.planId);
+    const plan = await this.loadActivePlan(dto.planId);
     this.assertDateRange(dto.contractStartAt, dto.contractEndAt);
 
-    const contract = await this.prisma.tenantContract.create({
-      data: {
-        contractName: dto.contractName ?? null,
-        planId: dto.planId,
-        agreedPrice: dto.agreedPrice,
-        currency: dto.currency,
-        paymentMethod: dto.paymentMethod,
-        paymentFrequency: dto.paymentFrequency,
-        contractStartAt: new Date(dto.contractStartAt),
-        contractEndAt: dto.contractEndAt ? new Date(dto.contractEndAt) : null,
-        discountPercent: dto.discountPercent ?? null,
-        gracePeriodDays: dto.gracePeriodDays ?? null,
-        autoRenew: dto.autoRenew ?? false,
-        notes: dto.notes ?? null,
-        status: ContractStatus.DRAFT,
-        createdByAdminId: actorAdminId,
-      },
-      include: contractInclude,
-    });
+    const contract = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.tenantContract.create({
+        data: {
+          contractName: dto.contractName ?? null,
+          planId: dto.planId,
+          agreedPrice: dto.agreedPrice,
+          currency: dto.currency,
+          paymentMethod: dto.paymentMethod,
+          paymentFrequency: dto.paymentFrequency,
+          contractStartAt: new Date(dto.contractStartAt),
+          contractEndAt: dto.contractEndAt ? new Date(dto.contractEndAt) : null,
+          discountPercent: dto.discountPercent ?? null,
+          gracePeriodDays: dto.gracePeriodDays ?? null,
+          autoRenew: dto.autoRenew ?? false,
+          notes: dto.notes ?? null,
+          status: ContractStatus.DRAFT,
+          planSnapshot: buildPlanSnapshot(plan),
+          createdByAdminId: actorAdminId,
+        },
+        include: contractInclude,
+      });
 
-    await this.auditService.logContractCreated(
-      actorAdminId,
-      contract.id,
-      metadata,
-      {
-        contractName: contract.contractName,
-        planId: contract.planId,
-        agreedPrice: dto.agreedPrice,
-        currency: dto.currency,
-      },
-    );
+      // Audit inside the transaction: a failing audit write must roll back
+      // the contract creation (commercial mutations are audited atomically).
+      await this.auditService.logContractCreated(
+        actorAdminId,
+        created.id,
+        metadata,
+        {
+          contractName: created.contractName,
+          planId: created.planId,
+          agreedPrice: dto.agreedPrice,
+          currency: dto.currency,
+        },
+        tx,
+      );
+
+      return created;
+    });
 
     return toContractDetail(contract);
   }
@@ -135,9 +143,8 @@ export class ContractsService {
     const existing = await this.findContractOrThrow(id);
     this.assertEditable(existing);
 
-    if (dto.planId) {
-      await this.assertPlanActive(dto.planId);
-    }
+    const nextPlan =
+      dto.planId !== undefined ? await this.loadActivePlan(dto.planId) : null;
 
     const startAt = dto.contractStartAt
       ? dto.contractStartAt
@@ -148,6 +155,8 @@ export class ContractsService {
         : existing.contractEndAt?.toISOString();
     this.assertDateRange(startAt, endAt ?? undefined);
 
+    const changes = this.collectChanges(existing, dto);
+
     const contract = await this.prisma.$transaction(async (tx) => {
       const updated = await tx.tenantContract.update({
         where: { id },
@@ -156,6 +165,11 @@ export class ContractsService {
             ? { contractName: dto.contractName }
             : {}),
           ...(dto.planId !== undefined ? { planId: dto.planId } : {}),
+          // Re-capture the snapshot whenever the signed plan changes so the
+          // frozen terms always match the contract's plan.
+          ...(nextPlan && dto.planId !== existing.planId
+            ? { planSnapshot: buildPlanSnapshot(nextPlan) }
+            : {}),
           ...(dto.agreedPrice !== undefined
             ? { agreedPrice: dto.agreedPrice }
             : {}),
@@ -203,18 +217,18 @@ export class ContractsService {
         );
       }
 
+      if (Object.keys(changes).length > 0) {
+        await this.auditService.logContractUpdated(
+          actorAdminId,
+          id,
+          metadata,
+          changes,
+          tx,
+        );
+      }
+
       return updated;
     });
-
-    const changes = this.collectChanges(existing, dto);
-    if (Object.keys(changes).length > 0) {
-      await this.auditService.logContractUpdated(
-        actorAdminId,
-        id,
-        metadata,
-        changes,
-      );
-    }
 
     return toContractDetail(contract);
   }
@@ -230,7 +244,7 @@ export class ContractsService {
       throw new BadRequestException('Only draft contracts can be activated');
     }
 
-    await this.assertPlanActive(existing.planId);
+    const plan = await this.loadActivePlan(existing.planId);
 
     if (existing.tenantId) {
       await this.assertTenantHasNoActiveContract(existing.tenantId, id);
@@ -239,7 +253,12 @@ export class ContractsService {
     const contract = await this.prisma.$transaction(async (tx) => {
       const updated = await tx.tenantContract.update({
         where: { id },
-        data: { status: ContractStatus.ACTIVE },
+        data: {
+          status: ContractStatus.ACTIVE,
+          // Activation is the signing moment: re-capture the snapshot so the
+          // frozen terms reflect the plan as it is when the deal goes live.
+          planSnapshot: buildPlanSnapshot(plan),
+        },
         include: contractInclude,
       });
 
@@ -255,10 +274,15 @@ export class ContractsService {
         );
       }
 
+      await this.auditService.logContractActivated(
+        actorAdminId,
+        id,
+        metadata,
+        tx,
+      );
+
       return updated;
     });
-
-    await this.auditService.logContractActivated(actorAdminId, id, metadata);
 
     return toContractDetail(contract);
   }
@@ -285,12 +309,6 @@ export class ContractsService {
 
     const terminatedAt = new Date();
 
-    const contract = await this.prisma.tenantContract.update({
-      where: { id },
-      data: { status: ContractStatus.TERMINATED },
-      include: contractInclude,
-    });
-
     const accessUntil = computeContractAccessEndAt(
       {
         contractEndAt: existing.contractEndAt,
@@ -299,10 +317,36 @@ export class ContractsService {
       existing.contractEndAt ? undefined : terminatedAt,
     );
 
-    await this.auditService.logContractTerminated(actorAdminId, id, metadata, {
-      tenantId: existing.tenantId,
-      accessUntil: accessUntil?.toISOString() ?? null,
-      gracePeriodDays: existing.gracePeriodDays,
+    const contract = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.tenantContract.update({
+        where: { id },
+        data: { status: ContractStatus.TERMINATED },
+        include: contractInclude,
+      });
+
+      // Termination suspends the linked tenant immediately and revokes all
+      // of its user sessions; the grace window only defines accessUntil for
+      // the audit trail (tenant-access.service enforces suspension first).
+      const suspension = await this.suspendTenantForTermination(
+        tx,
+        existing.tenantId,
+      );
+
+      await this.auditService.logContractTerminated(
+        actorAdminId,
+        id,
+        metadata,
+        {
+          tenantId: existing.tenantId,
+          accessUntil: accessUntil?.toISOString() ?? null,
+          gracePeriodDays: existing.gracePeriodDays,
+          tenantSuspended: suspension.suspended,
+          revokedSessions: suspension.revokedSessions,
+        },
+        tx,
+      );
+
+      return updated;
     });
 
     return toContractDetail(contract);
@@ -388,10 +432,21 @@ export class ContractsService {
     }
   }
 
-  private async assertPlanActive(planId: string): Promise<void> {
+  private async loadActivePlan(planId: string) {
     const plan = await this.prisma.subscriptionPlan.findUnique({
       where: { id: planId },
-      select: { id: true, isActive: true },
+      select: {
+        id: true,
+        isActive: true,
+        name: true,
+        defaultPrice: true,
+        currency: true,
+        maxUsers: true,
+        maxLeads: true,
+        maxProjects: true,
+        maxStorageBytes: true,
+        featureFlags: true,
+      },
     });
 
     if (!plan) {
@@ -401,6 +456,48 @@ export class ContractsService {
     if (!plan.isActive) {
       throw new BadRequestException('Plan must be active');
     }
+
+    return plan;
+  }
+
+  private async suspendTenantForTermination(
+    tx: Prisma.TransactionClient,
+    tenantId: string | null,
+  ): Promise<{ suspended: boolean; revokedSessions: number }> {
+    if (!tenantId) {
+      return { suspended: false, revokedSessions: 0 };
+    }
+
+    const tenant = await tx.tenant.findFirst({
+      where: { id: tenantId, deletedAt: null },
+      select: { status: true },
+    });
+
+    if (!tenant) {
+      return { suspended: false, revokedSessions: 0 };
+    }
+
+    if (tenant.status !== TenantStatus.SUSPENDED) {
+      await tx.tenant.update({
+        where: { id: tenantId },
+        data: { status: TenantStatus.SUSPENDED },
+      });
+    }
+
+    const users = await tx.user.findMany({
+      where: { tenantId, deletedAt: null },
+      select: { id: true },
+    });
+
+    const result = await tx.userSession.updateMany({
+      where: {
+        userId: { in: users.map((user) => user.id) },
+        revokedAt: null,
+      },
+      data: { revokedAt: new Date() },
+    });
+
+    return { suspended: true, revokedSessions: result.count };
   }
 
   private assertDateRange(startAt: string, endAt?: string): void {

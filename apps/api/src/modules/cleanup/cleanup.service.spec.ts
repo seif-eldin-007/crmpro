@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { JobStatus } from '@crmpro/database';
+import { JobStatus, TenantStatus } from '@crmpro/database';
 import { LoggingService } from '../../common/logging/logging.service';
 import { RequestContextService } from '../../common/logging/request-context.service';
 import { StorageLoggingService } from '../../common/logging/storage-logging.service';
@@ -130,7 +130,9 @@ describe('CleanupService', () => {
   });
 
   it('reclaims stale import jobs and requeues them', async () => {
-    prisma.importJob.findMany.mockResolvedValueOnce([{ id: 'import-1' }]);
+    prisma.importJob.findMany.mockResolvedValueOnce([
+      { id: 'import-1', tenant: { status: TenantStatus.ACTIVE } },
+    ]);
     prisma.importJob.updateMany.mockResolvedValue({ count: 1 });
 
     const result = await service.cleanupStaleImportJobs();
@@ -155,8 +157,29 @@ describe('CleanupService', () => {
     expect(queueService.requeueImportJob).toHaveBeenCalledWith('import-1');
   });
 
+  it('parks stale import jobs of suspended tenants as failed without requeue', async () => {
+    prisma.importJob.findMany.mockResolvedValueOnce([
+      { id: 'import-2', tenant: { status: TenantStatus.SUSPENDED } },
+    ]);
+    prisma.importJob.updateMany.mockResolvedValue({ count: 1 });
+
+    const result = await service.cleanupStaleImportJobs();
+
+    expect(result.updated).toBe(1);
+    expect(prisma.importJob.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: JobStatus.FAILED,
+        }) as Record<string, unknown>,
+      }),
+    );
+    expect(queueService.requeueImportJob).not.toHaveBeenCalled();
+  });
+
   it('reclaims stale export jobs and requeues them', async () => {
-    prisma.exportJob.findMany.mockResolvedValueOnce([{ id: 'export-1' }]);
+    prisma.exportJob.findMany.mockResolvedValueOnce([
+      { id: 'export-1', tenant: { status: TenantStatus.ACTIVE } },
+    ]);
     prisma.exportJob.updateMany.mockResolvedValue({ count: 1 });
 
     const result = await service.cleanupStaleExportJobs();
@@ -177,6 +200,28 @@ describe('CleanupService', () => {
       }),
     );
     expect(queueService.requeueExportJob).toHaveBeenCalledWith('export-1');
+  });
+
+  it('parks stale export jobs of cancelled tenants as failed without requeue', async () => {
+    prisma.exportJob.findMany.mockResolvedValueOnce([
+      { id: 'export-2', tenant: { status: TenantStatus.CANCELLED } },
+    ]);
+    prisma.exportJob.updateMany.mockResolvedValue({ count: 1 });
+
+    const result = await service.cleanupStaleExportJobs();
+
+    expect(result.updated).toBe(1);
+    expect(prisma.exportJob.updateMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: JobStatus.FAILED,
+          errorMessage: expect.stringContaining(
+            'suspended or cancelled',
+          ) as string,
+        }) as Record<string, unknown>,
+      }),
+    );
+    expect(queueService.requeueExportJob).not.toHaveBeenCalled();
   });
 
   it('deletes expired sessions', async () => {

@@ -891,6 +891,7 @@ model TenantContract {
   autoRenew        Boolean          @default(false)
   notes            String?          @db.VarChar(5000)
   status           ContractStatus   @default(DRAFT)
+  planSnapshot     Json?
   createdByAdminId String           @db.Uuid
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt

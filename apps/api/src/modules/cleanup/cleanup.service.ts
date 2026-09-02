@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JobStatus, Prisma } from '@crmpro/database';
+import { JobStatus, Prisma, TenantStatus } from '@crmpro/database';
 import { StorageLoggingService } from '../../common/logging/storage-logging.service';
 import { LoggingService } from '../../common/logging/logging.service';
 import { RequestContextService } from '../../common/logging/request-context.service';
@@ -21,6 +21,9 @@ import {
 } from './cleanup.constants';
 import { CleanupTaskResult } from './cleanup.types';
 import { CleanupHealthService } from './cleanup-health.service';
+
+const TENANT_INACTIVE_JOB_MESSAGE =
+  'Tenant is suspended or cancelled; job cannot run.';
 
 @Injectable()
 export class CleanupService {
@@ -167,7 +170,7 @@ export class CleanupService {
           status: JobStatus.PROCESSING,
           updatedAt: { lt: cutoff },
         },
-        select: { id: true },
+        select: { id: true, tenant: { select: { status: true } } },
         take: batchSize,
       });
 
@@ -176,6 +179,33 @@ export class CleanupService {
       }
 
       for (const job of batch) {
+        // Never re-queue work for suspended/cancelled tenants: park the job
+        // as FAILED with a clear reason instead of looping it through the
+        // worker (which would refuse it anyway).
+        if (this.isTenantInactive(job.tenant.status)) {
+          const parked = await this.prisma.importJob.updateMany({
+            where: {
+              id: job.id,
+              status: JobStatus.PROCESSING,
+              updatedAt: { lt: cutoff },
+            },
+            data: {
+              status: JobStatus.FAILED,
+              completedAt: new Date(),
+              errorSummary: [{ row: 0, reason: TENANT_INACTIVE_JOB_MESSAGE }],
+            },
+          });
+
+          if (parked.count === 1) {
+            updated += 1;
+            this.logger.warn(
+              `${STALE_IMPORT_JOB_RECLAIMED} jobId=${job.id} tenantInactive=true`,
+            );
+          }
+
+          continue;
+        }
+
         const reclaimed = await this.prisma.importJob.updateMany({
           where: {
             id: job.id,
@@ -226,7 +256,7 @@ export class CleanupService {
           status: JobStatus.PROCESSING,
           updatedAt: { lt: cutoff },
         },
-        select: { id: true },
+        select: { id: true, tenant: { select: { status: true } } },
         take: batchSize,
       });
 
@@ -235,6 +265,31 @@ export class CleanupService {
       }
 
       for (const job of batch) {
+        // Same suspension guard as stale import jobs: park instead of re-queue.
+        if (this.isTenantInactive(job.tenant.status)) {
+          const parked = await this.prisma.exportJob.updateMany({
+            where: {
+              id: job.id,
+              status: JobStatus.PROCESSING,
+              updatedAt: { lt: cutoff },
+            },
+            data: {
+              status: JobStatus.FAILED,
+              errorMessage: TENANT_INACTIVE_JOB_MESSAGE,
+              completedAt: new Date(),
+            },
+          });
+
+          if (parked.count === 1) {
+            updated += 1;
+            this.logger.warn(
+              `${STALE_EXPORT_JOB_RECLAIMED} jobId=${job.id} tenantInactive=true`,
+            );
+          }
+
+          continue;
+        }
+
         const reclaimed = await this.prisma.exportJob.updateMany({
           where: {
             id: job.id,
@@ -356,6 +411,12 @@ export class CleanupService {
     } while (continuationToken);
 
     return { deleted, updated: 0 };
+  }
+
+  private isTenantInactive(status: TenantStatus): boolean {
+    return (
+      status === TenantStatus.SUSPENDED || status === TenantStatus.CANCELLED
+    );
   }
 
   private getBatchSize(): number {

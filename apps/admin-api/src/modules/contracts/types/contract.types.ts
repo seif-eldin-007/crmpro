@@ -3,6 +3,7 @@ import type {
   PaymentFrequency,
   PaymentMethod,
 } from '@crmpro/database';
+import type { PlanSnapshot } from '@crmpro/shared';
 
 export interface ContractPlanSummary {
   id: string;
@@ -27,6 +28,7 @@ export interface ContractListItem {
   paymentFrequency: PaymentFrequency;
   contractStartAt: Date;
   contractEndAt: Date | null;
+  gracePeriodDays: number | null;
   autoRenew: boolean;
 }
 
@@ -35,6 +37,8 @@ export interface ContractDetail {
   contractName: string | null;
   status: ContractStatus;
   plan: ContractPlanSummary;
+  /** Frozen plan terms captured at signing; null for legacy contracts. */
+  planSnapshot: PlanSnapshot | null;
   tenantId: string | null;
   agreedPrice: number;
   currency: string;

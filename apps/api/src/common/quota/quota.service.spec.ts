@@ -8,6 +8,7 @@ describe('QuotaService', () => {
   let service: QuotaService;
   let prisma: {
     tenant: { findFirst: jest.Mock };
+    tenantContract: { findFirst: jest.Mock };
     lead: { count: jest.Mock };
     project: { count: jest.Mock };
     user: { count: jest.Mock };
@@ -26,6 +27,8 @@ describe('QuotaService', () => {
           subscriptionPlan: starterPlan,
         }),
       },
+      // Default: no active contract snapshot -> live plan fallback.
+      tenantContract: { findFirst: jest.fn().mockResolvedValue(null) },
       lead: { count: jest.fn() },
       project: { count: jest.fn() },
       user: { count: jest.fn() },
@@ -103,6 +106,50 @@ describe('QuotaService', () => {
     );
   });
 
+  describe('plan snapshot precedence', () => {
+    const frozenSnapshot = {
+      planId: 'plan-1',
+      name: 'Frozen at signing',
+      price: null,
+      currency: null,
+      quotas: {
+        maxUsers: 50,
+        maxLeads: 100,
+        maxProjects: 5,
+        maxStorageBytes: null,
+      },
+      featureFlags: {},
+      capturedAt: '2026-01-01T00:00:00.000Z',
+    };
+
+    it('prefers the active contract snapshot over the live plan', async () => {
+      prisma.tenantContract.findFirst.mockResolvedValueOnce({
+        planSnapshot: frozenSnapshot,
+      });
+      // Live plan would reject at 2 leads; the snapshot allows 100.
+      prisma.lead.count.mockResolvedValue(10);
+
+      await expect(
+        service.assertCanCreateLead('tenant-1'),
+      ).resolves.toBeUndefined();
+
+      expect(prisma.tenant.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('falls back to the live plan for legacy contracts without snapshot', async () => {
+      prisma.tenantContract.findFirst.mockResolvedValueOnce({
+        planSnapshot: null,
+      });
+      prisma.lead.count.mockResolvedValue(2);
+
+      await expect(service.assertCanCreateLead('tenant-1')).rejects.toThrow(
+        new ForbiddenException(QUOTA_EXCEEDED_MESSAGES.LEAD),
+      );
+
+      expect(prisma.tenant.findFirst).toHaveBeenCalled();
+    });
+  });
+
   describe('transaction-safe quota checks', () => {
     const tx = {
       $queryRaw: jest.fn().mockResolvedValue([{ id: 'tenant-1' }]),
@@ -112,6 +159,7 @@ describe('QuotaService', () => {
           subscriptionPlan: starterPlan,
         }),
       },
+      tenantContract: { findFirst: jest.fn().mockResolvedValue(null) },
       lead: { count: jest.fn() },
       project: { count: jest.fn() },
       user: { count: jest.fn() },
@@ -137,6 +185,31 @@ describe('QuotaService', () => {
       await expect(
         service.assertCanCreateLeadInTransaction(tx as never, 'tenant-1'),
       ).rejects.toThrow(new ForbiddenException(QUOTA_EXCEEDED_MESSAGES.LEAD));
+    });
+
+    it('uses snapshot storage limits (serialized BigInt) in transaction', async () => {
+      tx.tenantContract.findFirst.mockResolvedValueOnce({
+        planSnapshot: {
+          planId: 'plan-1',
+          name: 'Frozen at signing',
+          quotas: {
+            maxUsers: 5,
+            maxLeads: 2,
+            maxProjects: 10,
+            maxStorageBytes: '100',
+          },
+          featureFlags: {},
+          capturedAt: '2026-01-01T00:00:00.000Z',
+        },
+      });
+      tx.tenant.findFirst.mockResolvedValue({ storageUsedBytes: 80n });
+      tx.fileUploadIntent.aggregate.mockResolvedValue({
+        _sum: { sizeBytes: 15n },
+      });
+
+      await expect(
+        service.assertCanUseStorageInTransaction(tx as never, 'tenant-1', 10),
+      ).rejects.toThrow('Storage quota exceeded');
     });
 
     it('rejects storage usage in transaction when projected usage exceeds limit', async () => {

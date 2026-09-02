@@ -1,4 +1,5 @@
 import { Prisma } from '@crmpro/database';
+import { parsePlanSnapshot } from '@crmpro/shared';
 import type { ContractDetail, ContractListItem } from '../types/contract.types';
 
 type ContractWithPlan = {
@@ -11,14 +12,15 @@ type ContractWithPlan = {
   paymentFrequency: ContractListItem['paymentFrequency'];
   contractStartAt: Date;
   contractEndAt: Date | null;
+  gracePeriodDays: number | null;
   autoRenew: boolean;
   plan: { id: string; name: string; isActive: boolean };
 };
 
 type ContractWithRelations = ContractWithPlan & {
   tenantId: string | null;
+  planSnapshot: Prisma.JsonValue;
   discountPercent: number | null;
-  gracePeriodDays: number | null;
   notes: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -43,6 +45,7 @@ export function toContractListItem(
     paymentFrequency: contract.paymentFrequency,
     contractStartAt: contract.contractStartAt,
     contractEndAt: contract.contractEndAt,
+    gracePeriodDays: contract.gracePeriodDays,
     autoRenew: contract.autoRenew,
   };
 }
@@ -59,6 +62,7 @@ export function toContractDetail(
       name: contract.plan.name,
       isActive: contract.plan.isActive,
     },
+    planSnapshot: parsePlanSnapshot(contract.planSnapshot),
     tenantId: contract.tenantId,
     agreedPrice: toPrice(contract.agreedPrice),
     currency: contract.currency,

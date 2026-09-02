@@ -3,6 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ContractStatus } from '@crmpro/database';
+import { parsePlanSnapshot } from '@crmpro/shared';
 import { PrismaService } from '../prisma/prisma.service';
 import { FEATURE_UNAVAILABLE_MESSAGE } from './entitlement.constants';
 import type { PlanFeatureFlags, PlanFeatureKey } from './entitlement.types';
@@ -27,6 +29,25 @@ export class PlanEntitlementService {
   }
 
   private async loadFeatureFlags(tenantId: string): Promise<PlanFeatureFlags> {
+    // Feature flags frozen in the active contract's planSnapshot win over the
+    // live plan row; the live plan is only a fallback for legacy contracts
+    // signed before snapshots existed.
+    const contract = await this.prisma.tenantContract.findFirst({
+      where: {
+        tenantId,
+        status: ContractStatus.ACTIVE,
+        deletedAt: null,
+      },
+      select: { planSnapshot: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const snapshot = contract ? parsePlanSnapshot(contract.planSnapshot) : null;
+
+    if (snapshot) {
+      return snapshot.featureFlags;
+    }
+
     const tenant = await this.prisma.tenant.findFirst({
       where: { id: tenantId, deletedAt: null },
       select: {

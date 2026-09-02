@@ -1,6 +1,9 @@
 "use client";
 
-import { ADMIN_PERMISSIONS } from "@crmpro/shared";
+import {
+  ADMIN_PERMISSIONS,
+  computeContractAccessEndAt,
+} from "@crmpro/shared";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,9 +20,24 @@ import {
 } from "@/features/contracts/mutations";
 import type { ContractListItem } from "@/features/contracts/types";
 import { usePermissions } from "@/hooks/use-permissions";
+import { formatDate } from "@/lib/format";
 
 function contractLabel(contract: ContractListItem | null) {
   return contract?.contractName?.trim() || "this contract";
+}
+
+function contractAccessEndLabel(contract: ContractListItem | null) {
+  if (!contract) return null;
+
+  const accessUntil = computeContractAccessEndAt(
+    {
+      contractEndAt: contract.contractEndAt,
+      gracePeriodDays: contract.gracePeriodDays,
+    },
+    contract.contractEndAt ? undefined : new Date(),
+  );
+
+  return accessUntil ? formatDate(accessUntil.toISOString()) : null;
 }
 
 interface ContractActionDialogProps {
@@ -103,15 +121,20 @@ export function ContractTerminateDialog({
 
   if (!can(ADMIN_PERMISSIONS.CONTRACT_TERMINATE)) return null;
 
+  const accessEndLabel = contractAccessEndLabel(contract);
+
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Terminate contract</DialogTitle>
           <DialogDescription>
-            Terminate &quot;{contractLabel(contract)}&quot;? This ends the
-            commercial agreement. Linked tenant access follows the configured
-            grace period.
+            Terminate &quot;{contractLabel(contract)}&quot;? The linked tenant
+            will be suspended immediately and all of its user sessions will be
+            revoked.
+            {accessEndLabel
+              ? ` Contract access ends ${accessEndLabel}.`
+              : " Contract access ends immediately."}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
